@@ -2,7 +2,7 @@ import React, { Suspense, lazy } from "react";
 import {
   Route,
   Navigate,
-  createBrowserRouter,
+  createHashRouter,
   createRoutesFromElements,
   RouterProvider,
 } from "react-router-dom";
@@ -22,7 +22,7 @@ const PageNotFound = lazy(() =>
 );
 const ForgotPassword = lazy(() => import("./components/ForgotPassword.jsx"));
 
-const router = createBrowserRouter(
+const router = createHashRouter(
   createRoutesFromElements(
     <>
       <Route path="/register" element={<Register />} />
