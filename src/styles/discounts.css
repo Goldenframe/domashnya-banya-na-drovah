@@ -1,0 +1,211 @@
+
+.discount {
+  margin-top: 10px;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+.discount-label {
+  margin: 30px 0;
+}
+
+.discount-container .additional-services {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Два столбца */
+  gap: 15px; /* Отступы между элементами */
+  width: 100%; 
+}
+
+.discount-container .service-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+  margin-top: 0;
+}
+
+.discount-container .additional-services .service-item span {
+  color: #9e835e;
+  font-size: 18px;
+}
+
+.discount-container
+  .additional-services
+  .service-item
+  .service-quantity-input[type="number"] {
+  width: 90px;
+}
+
+.discount-container .additional-services {
+  gap: 40px;
+  margin-top: 40px;
+  margin-bottom: 20px;
+}
+
+.free-service-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.discount-container .additional-services .service-item .free-service-item span {
+  color: #63523b;
+}
+
+.discount-container
+  .additional-services
+  .service-item
+  .free-service-item
+  label {
+  color: #9e835e;
+  font-size: 18px;
+  text-align: left;
+}
+
+.free-service-quantity {
+  display: flex;
+  justify-content: space-between;
+  margin: 15px 0;
+}
+
+.perсentage-discount {
+  width: 320px;
+}
+
+.discount-card-container {
+  width: 100%;
+  margin-top: 20px;
+  display: grid;
+  grid-gap: 30px;
+  grid-template-columns: repeat(auto-fill, minmax(30%, 1fr));  
+  grid-template-rows: auto auto auto;
+}
+
+.discount-card {
+  background-color: #fcf4e7;
+}
+
+.discount-header {
+  background-color: #63523b;
+  width: 100%;
+  text-align: center;
+  padding: 15px;
+}
+
+.discount-header h4 {
+  color: #fffdf9;
+  font-weight: normal;
+  font-size: 18px;
+}
+
+.discount-card .actions-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-bottom: 30px;
+}
+
+.discount-info {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 30px;
+  border-bottom: 2px #fffdf9 solid;
+  color: #9e835e;
+  flex-wrap: wrap;
+}
+
+
+
+@media (max-width: 1024px) {
+  .discount-container .additional-services {
+    grid-template-columns: 1fr; /* Один столбец на планшетах */
+    gap: 20px;
+  }
+
+  .discount-container .service-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .discount-container .additional-services .service-item span {
+    font-size: 16px;
+  }
+
+  .discount-info {
+    padding: 12px 20px;
+  }
+
+  .discount-card-container {
+    grid-template-columns: repeat(auto-fill, minmax(45%, 1fr)); /* Два столбца */
+  }
+}
+
+@media (max-width: 780px) {
+  .discount-container .additional-services {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .discount-container .additional-services .service-item {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .discount-container .additional-services .service-item span {
+    font-size: 14px;
+  }
+
+  .discount-card-container {
+    grid-template-columns: 1fr; /* Один столбец */
+    gap: 20px;
+    width: 90%;
+  }
+
+  .discount-header {
+    padding: 12px;
+  }
+
+  .discount-header h4 {
+    font-size: 16px;
+  }
+
+  .discount-info {
+    padding: 10px 16px;
+  }
+}
+
+@media (max-width: 650px) {
+
+  .discount-label .form-label{
+    margin: 0;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .discount-container .additional-services {
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .discount-container .additional-services .service-item span {
+    font-size: 12px;
+  }
+
+  .discount-container .additional-services .service-item {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .discount-card-container {
+    grid-template-columns: 1fr; /* Один столбец */
+    gap: 15px;
+  }
+
+  .discount-info {
+    flex-direction: column;
+    padding: 15px 25px;
+  }
+}

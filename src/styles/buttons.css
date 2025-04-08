@@ -1,0 +1,38 @@
+/* button {
+  margin: 0 auto;
+  min-width: 220px;
+  font-size: 20px;
+  background-color: #63523b;
+  color: #fffdf9;
+  margin-top: 33px;
+  padding: 10px 60px;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #9e835e;
+}
+
+button:disabled {
+    background-color: rgba(158, 131, 94, 0.6);
+    cursor: not-allowed;
+  }
+
+.submit-button {
+  background-color: #22cbbd;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.submit-button:hover {
+  background-color: #22cbbd;
+} */
