@@ -410,7 +410,7 @@ function Register() {
           <div className="auth-links">
             <p>
               Уже есть учетная запись?
-              <Link to="/domashnya-banya-na-drovah/login" className="auth-link">
+              <Link to="/login" className="auth-link">
                 {" "}
                 Войдите
               </Link>
