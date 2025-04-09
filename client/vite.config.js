@@ -7,9 +7,9 @@ export default defineConfig({
     server: {
         proxy: {
             '/api': {
-                target: 'http://api.dom-ban-na-drovah.ru', 
+                target: 'https://api.dom-ban-na-drovah.ru', 
                 changeOrigin: true,
-                secure: false, 
+                secure: true, 
                 rewrite: (path) => path.replace(/^\/api/, '')
             }
         },
