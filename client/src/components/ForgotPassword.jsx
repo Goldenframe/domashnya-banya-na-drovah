@@ -11,17 +11,16 @@ function ForgotPassword() {
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [isCodeVerified, setIsCodeVerified] = useState(false); // Стейт для проверки правильности кода
-  const [resendTimeout, setResendTimeout] = useState(null); // Таймер для повторной отправки кода
-  const [showNewPassword, setShowNewPassword] = useState(false); // Для отображения пароля
-  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false); // Для подтверждения пароля
-  const navigate = useNavigate();
+  const [isCodeVerified, setIsCodeVerified] = useState(false); 
+  const [resendTimeout, setResendTimeout] = useState(null); 
+  const [showNewPassword, setShowNewPassword] = useState(false); 
+  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false); 
   const { message, showMessage, error, showError, isVisible } =
     useShowMessage();
     const apiUrl = import.meta.env.VITE_API_URL; 
   const sendCode = async () => {
     try {
-      const response = await axios.post(`/api/forgot-password`, {
+      const response = await axios.post(`http://api.dom-ban-na-drovah.ru/api/forgot-password`, {
         phone_number: phone,
       });
       showMessage(response.data.message);
@@ -38,7 +37,7 @@ function ForgotPassword() {
 
   const verifyCode = async () => {
     try {
-      const response = await axios.post(`/api/verify-code`, {
+      const response = await axios.post(`http://api.dom-ban-na-drovah.ru/api/verify-code`, {
         phone_number: phone,
         verification_code: code,
       });
@@ -58,7 +57,7 @@ function ForgotPassword() {
     }
 
     try {
-      const response = await axios.post(`/api/reset-password`, {
+      const response = await axios.post(`http://api.dom-ban-na-drovah.ru/api/reset-password`, {
         phone_number: phone,
         verification_code: code,
         new_password: newPassword,

@@ -73,7 +73,7 @@ function Login() {
         }
 
         try {
-            const response = await axios.post(`/api/login`, { 
+            const response = await axios.post(`http://api.dom-ban-na-drovah.ru/api/login`, { 
                 phone_number: cleanPhone, 
                 password 
             });

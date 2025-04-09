@@ -45,7 +45,7 @@ const EditProfile = ({ userId, token, updateUserData }) => {
     const fetchUserData = async () => {
       try {
         const response = await axios.get(
-          `/api/userAccount/${userId}/profileData`,
+          `http://api.dom-ban-na-drovah.ru/api/userAccount/${userId}/profileData`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -100,7 +100,7 @@ const EditProfile = ({ userId, token, updateUserData }) => {
         return;
       }
 
-      const response = await axios.delete(`/api/userAccount/${userId}`, {
+      const response = await axios.delete(`http://api.dom-ban-na-drovah.ru/api/userAccount/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       showMessage(response.data.message);
@@ -200,7 +200,7 @@ const EditProfile = ({ userId, token, updateUserData }) => {
       setIsCodeSent(false);
       const cleanPhone = getCleanPhoneNumber();
       const response = await axios.post(
-        `/api/request-phone-change`,
+        `http://api.dom-ban-na-drovah.ru/api/request-phone-change`,
         { userId, new_phone_number: cleanPhone },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -221,7 +221,7 @@ const EditProfile = ({ userId, token, updateUserData }) => {
     try {
       const cleanPhone = getCleanPhoneNumber();
       const response = await axios.post(
-        `/api/verify-phone-change`,
+        `http://api.dom-ban-na-drovah.ru/api/verify-phone-change`,
         {
           userId,
           new_phone_number: cleanPhone,
@@ -321,7 +321,7 @@ const EditProfile = ({ userId, token, updateUserData }) => {
     try {
       const cleanPhone = getCleanPhoneNumber();
       const response = await axios.post(
-        `/api/userAccount/${userId}/editProfile`,
+        `http://api.dom-ban-na-drovah.ru/api/userAccount/${userId}/editProfile`,
         {
           userId,
           first_name: firstName,
@@ -410,7 +410,7 @@ const EditProfile = ({ userId, token, updateUserData }) => {
   const handleCancelChanges = async () => {
     try {
       const response = await axios.get(
-        `/api/userAccount/${userId}/profileData`,
+        `http://api.dom-ban-na-drovah.ru/api/userAccount/${userId}/profileData`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

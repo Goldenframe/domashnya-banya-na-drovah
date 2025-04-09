@@ -8,7 +8,7 @@ export default function UserBookings({ userId, token }) {
     const apiUrl = import.meta.env.VITE_API_URL; 
     const fetchUserBookings = useCallback(async () => {
         try {
-            const response = await axios.get(`/api/userAccount/${userId}/bookings`, {
+            const response = await axios.get(`http://api.dom-ban-na-drovah.ru/api/userAccount/${userId}/bookings`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setBookings(response.data);
