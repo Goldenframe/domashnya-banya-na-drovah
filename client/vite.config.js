@@ -8,9 +8,12 @@ export default defineConfig({
         proxy: {
             '/api': {
                 target: 'https://api.dom-ban-na-drovah.ru', 
-                changeOrigin: true,
-                secure: true, 
-                rewrite: (path) => path.replace(/^\/api/, '')
+                changeOrigin: true,       
+                secure: true,            
+                rewrite: (path) => path.replace(/^\/api/, ''), 
+                headers: {
+                    'X-Forwarded-Proto': 'https'
+                }
             }
         },
         historyApiFallback: true,
