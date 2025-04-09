@@ -7,7 +7,7 @@ export default defineConfig({
     server: {
         proxy: {
             '/api': {
-                target: 'http://89.111.153.179:5000',
+                target: 'http://dom-ban-na-drovah.ru',
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/api/, '')
             }
