@@ -19,7 +19,7 @@ export default function IntervalList() {
             return;
         }
         try {
-            await axios.delete(`/api/adminAccount/${userId}/intervals/${intervalId}`, {
+            await axios.delete(`https://api.dom-ban-na-drovah.ru/api/adminAccount/${userId}/intervals/${intervalId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             showMessage('Интервал успешно удален!');

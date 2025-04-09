@@ -32,7 +32,7 @@ export default function AddInterval() {
     const fetchAvailableIntervals = async () => {
         try {
             console.log("Запрос интервалов на дату: ", bookingDateStart);
-            const response = await axios.get(`/api/adminAccount/${userId}/availableIntervals/${bookingDateStart}`, {
+            const response = await axios.get(`https://api.dom-ban-na-drovah.ru/api/adminAccount/${userId}/availableIntervals/${bookingDateStart}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -104,7 +104,7 @@ export default function AddInterval() {
             }
 
             const responses = await Promise.all(intervalsToAdd.map(interval =>
-                axios.post(`/api/adminAccount/${userId}/intervals`, interval, { headers: { Authorization: `Bearer ${token}` } })
+                axios.post(`https://api.dom-ban-na-drovah.ru/api/adminAccount/${userId}/intervals`, interval, { headers: { Authorization: `Bearer ${token}` } })
             ));
 
             const newIntervals = responses.map(response => {

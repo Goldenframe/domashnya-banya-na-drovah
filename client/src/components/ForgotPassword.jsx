@@ -20,7 +20,7 @@ function ForgotPassword() {
     const apiUrl = import.meta.env.VITE_API_URL; 
   const sendCode = async () => {
     try {
-      const response = await axios.post(`http://api.dom-ban-na-drovah.ru/api/forgot-password`, {
+      const response = await axios.post(`https://api.dom-ban-na-drovah.ru/api/forgot-password`, {
         phone_number: phone,
       });
       showMessage(response.data.message);
@@ -37,7 +37,7 @@ function ForgotPassword() {
 
   const verifyCode = async () => {
     try {
-      const response = await axios.post(`http://api.dom-ban-na-drovah.ru/api/verify-code`, {
+      const response = await axios.post(`https://api.dom-ban-na-drovah.ru/api/verify-code`, {
         phone_number: phone,
         verification_code: code,
       });
@@ -57,7 +57,7 @@ function ForgotPassword() {
     }
 
     try {
-      const response = await axios.post(`http://api.dom-ban-na-drovah.ru/api/reset-password`, {
+      const response = await axios.post(`https://api.dom-ban-na-drovah.ru/api/reset-password`, {
         phone_number: phone,
         verification_code: code,
         new_password: newPassword,

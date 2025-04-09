@@ -69,7 +69,7 @@ const AdminDiscountsManager = ({ userId, token }) => {
 
     const fetchActiveDiscounts = async () => {
         try {
-            const response = await axios.get('/api/adminAccount/:userId/discounts/active', {
+            const response = await axios.get('https://api.dom-ban-na-drovah.ru/api/adminAccount/:userId/discounts/active', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setDiscounts(response.data);
@@ -106,7 +106,7 @@ const AdminDiscountsManager = ({ userId, token }) => {
     };
     const createDiscount = async (newDiscount) => {
         try {
-            const response = await axios.post(`/api/adminAccount/:userId/discounts`, newDiscount, {
+            const response = await axios.post(`https://api.dom-ban-na-drovah.ru/api/adminAccount/:userId/discounts`, newDiscount, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -120,7 +120,7 @@ const AdminDiscountsManager = ({ userId, token }) => {
 
     const updateDiscount = async (discountId, updatedDiscount) => {
         try {
-            const response = await axios.put(`/api/adminAccount/:userId/discounts/${discountId}`, updatedDiscount, {
+            const response = await axios.put(`https://api.dom-ban-na-drovah.ru/api/adminAccount/:userId/discounts/${discountId}`, updatedDiscount, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -161,7 +161,7 @@ const AdminDiscountsManager = ({ userId, token }) => {
     };
     const handleDeleteDiscount = async (discountId) => {
         try {
-            const response = await axios.delete(`/api/adminAccount/${userId}/discounts/${discountId}`, {
+            const response = await axios.delete(`https://api.dom-ban-na-drovah.ru/api/adminAccount/${userId}/discounts/${discountId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 

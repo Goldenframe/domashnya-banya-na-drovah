@@ -139,7 +139,7 @@ export default function DiscountForm() {
     };
     const createDiscount = async (newDiscount) => {
         try {
-            const response = await axios.post(`/api/adminAccount/${userId}/discounts`, newDiscount, {
+            const response = await axios.post(`https://api.dom-ban-na-drovah.ru/api/adminAccount/${userId}/discounts`, newDiscount, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -153,7 +153,7 @@ export default function DiscountForm() {
 
     const updateDiscount = async (discountId, updatedDiscount) => {
         try {
-            const response = await axios.put(`/api/adminAccount/${userId}/discounts/${discountId}`, updatedDiscount, {
+            const response = await axios.put(`https://api.dom-ban-na-drovah.ru/api/adminAccount/${userId}/discounts/${discountId}`, updatedDiscount, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             return response.data;

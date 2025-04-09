@@ -15,7 +15,7 @@ const Intervals = ({ userId, token }) => {
     const apiUrl = import.meta.env.VITE_API_URL; 
     const fetchIntervals = useCallback(async () => {
         try {
-            const response = await axios.get(`/api/adminAccount/${userId}/intervals`, {
+            const response = await axios.get(`https://api.dom-ban-na-drovah.ru/api/adminAccount/${userId}/intervals`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (response.data) {

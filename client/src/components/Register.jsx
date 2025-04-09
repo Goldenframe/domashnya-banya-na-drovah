@@ -105,7 +105,7 @@ function Register() {
 
     try {
       const cleanPhone = getCleanPhoneNumber();
-      const response = await axios.post(`http://api.dom-ban-na-drovah.ru/api/register`, {
+      const response = await axios.post(`https://api.dom-ban-na-drovah.ru/api/register`, {
         phone_number: cleanPhone,
       });
 

@@ -12,7 +12,7 @@ export default function DiscountList() {
     const apiUrl = import.meta.env.VITE_API_URL; 
     const handleDeleteDiscount = async (discountId) => {
         try {
-            const response = await axios.delete(`/api/adminAccount/${userId}/discounts/${discountId}`, {
+            const response = await axios.delete(`https://api.dom-ban-na-drovah.ru/api/adminAccount/${userId}/discounts/${discountId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 

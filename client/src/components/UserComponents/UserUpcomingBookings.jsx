@@ -63,7 +63,7 @@ export default function UserUpcomingBookings() {
         }
 
         try {
-            await axios.delete(`http://api.dom-ban-na-drovah.ru/api/userAccount/${userId}/bookings/${bookingId}`, {
+            await axios.delete(`https://api.dom-ban-na-drovah.ru/api/userAccount/${userId}/bookings/${bookingId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setBookings(prevBookings => prevBookings.filter(booking => booking.booking_id !== bookingId));

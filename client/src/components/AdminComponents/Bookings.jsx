@@ -10,7 +10,7 @@ const Bookings = ({ userId, token }) => {
     const apiUrl = import.meta.env.VITE_API_URL; 
     const fetchBookings = useCallback(async () => {
         try {
-            const response = await axios.get(`/api/adminAccount/${userId}/bookings`, {
+            const response = await axios.get(`https://api.dom-ban-na-drovah.ru/api/adminAccount/${userId}/bookings`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setBookings(response.data);
