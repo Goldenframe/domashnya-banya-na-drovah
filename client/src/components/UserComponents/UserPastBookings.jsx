@@ -49,7 +49,6 @@ export default function UserPastBookings() {
         <div className='table-container'>
             {sortedBookings.length > 0 ? (
                 <table className="accessible-table" role="grid" aria-labelledby="past-bookings-title">
-                    <caption id="past-bookings-title">Прошедшие бронирования</caption>
                     <thead>
                         <tr>
                             <th scope="col" onClick={() => handleSort('date')} className="sortable">

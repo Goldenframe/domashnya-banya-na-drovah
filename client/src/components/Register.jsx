@@ -137,7 +137,7 @@ function Register() {
 
     try {
       const cleanPhone = getCleanPhoneNumber();
-      const response = await axios.post("/api/verify-registration", {
+      const response = await axios.post("https://api.dom-ban-na-drovah.ru/api/verify-registration", {
         first_name: formData.firstName,
         last_name: formData.lastName,
         password: formData.password,

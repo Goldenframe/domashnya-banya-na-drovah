@@ -83,7 +83,6 @@ export default function UserUpcomingBookings() {
             )}
             {sortedBookings.length > 0 ? (
                 <table className="accessible-table" role="grid" aria-labelledby="upcoming-bookings-title">
-                    <caption id="upcoming-bookings-title">Предстоящие бронирования</caption>
                     <thead>
                         <tr>
                             <th scope="col" onClick={() => handleSort('date')} className="sortable">
