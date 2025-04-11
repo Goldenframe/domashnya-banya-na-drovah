@@ -44,7 +44,7 @@ function BookingForm({ userId, token }) {
         try {
             const token = Cookies.get("token");
 
-            const response = await axios.get(`/api/userAccount/${userId}/availableIntervals/${bookingDate}`, {
+            const response = await axios.get(`https://api.dom-ban-na-drovah.ru/api/userAccount/${userId}/availableIntervals/${bookingDate}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -62,7 +62,7 @@ function BookingForm({ userId, token }) {
     const fetchAvailableEndTimes = useCallback(async (startTime, intervalId) => {
         try {
             const token = Cookies.get("token");
-            const response = await axios.get(`/api/userAccount/${userId}/availableEndTimes/${bookingDate}/${startTime}/${intervalId}`, {
+            const response = await axios.get(`https://api.dom-ban-na-drovah.ru/api/userAccount/${userId}/availableEndTimes/${bookingDate}/${startTime}/${intervalId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -137,7 +137,7 @@ function BookingForm({ userId, token }) {
 
     const fetchDiscounts = async () => {
         try {
-            const response = await axios.get(`/api/userAccount/${userId}/discounts`, {
+            const response = await axios.get(`https://api.dom-ban-na-drovah.ru/api/userAccount/${userId}/discounts`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setDiscounts(response.data);
@@ -292,7 +292,7 @@ function BookingForm({ userId, token }) {
             if (!bookingDate || !startTime || !endTime) {
                 throw new Error("Пожалуйста, выберите дату и время.");
             }
-            const response = await axios.post(`/api/userAccount/${userId}/book`, {
+            const response = await axios.post(`https://api.dom-ban-na-drovah.ru/api/userAccount/${userId}/book`, {
                 booking_date: bookingDate,
                 start_time: startTime,
                 end_time: endTime,
@@ -347,7 +347,7 @@ function BookingForm({ userId, token }) {
 
         for (const date of selectedDates) {
             try {
-                const response = await axios.get(`/api/userAccount/${userId}/availableIntervals/${date}`, {
+                const response = await axios.get(`https://api.dom-ban-na-drovah.ru/api/userAccount/${userId}/availableIntervals/${date}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 
