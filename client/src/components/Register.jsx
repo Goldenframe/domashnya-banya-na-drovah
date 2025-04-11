@@ -105,9 +105,12 @@ function Register() {
 
     try {
       const cleanPhone = getCleanPhoneNumber();
-      const response = await axios.post(`https://api.dom-ban-na-drovah.ru/api/register`, {
-        phone_number: cleanPhone,
-      });
+      const response = await axios.post(
+        `https://api.dom-ban-na-drovah.ru/api/register`,
+        {
+          phone_number: cleanPhone,
+        }
+      );
 
       if (response.status === 200) {
         setUiState({
@@ -137,34 +140,40 @@ function Register() {
 
     try {
       const cleanPhone = getCleanPhoneNumber();
-      const response = await axios.post("https://api.dom-ban-na-drovah.ru/api/verify-registration", {
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        password: formData.password,
-        phone_number: cleanPhone,
-        verification_code: formData.verificationCode,
-      });
+      const response = await axios.post(
+        "https://api.dom-ban-na-drovah.ru/api/verify-registration",
+        {
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          password: formData.password,
+          phone_number: cleanPhone,
+          verification_code: formData.verificationCode,
+        },
+        { timeout: 10000 }
+      );
 
       if (response.status === 201) {
         const { token, userId, first_name, last_name } = response.data;
-
         Cookies.set("token", token, { expires: 7, secure: true });
         Cookies.set("userId", userId, { expires: 7, secure: true });
         Cookies.set("firstName", first_name, { expires: 7, secure: true });
         Cookies.set("lastName", last_name, { expires: 7, secure: true });
-
         navigate(`/userAccount/${userId}`);
+      } else {
+        showError("Неизвестная ошибка сервера");
       }
     } catch (error) {
-      showError(
-        error.response?.data?.error ||
-          "Ошибка регистрации. Пожалуйста, проверьте данные."
-      );
+      if (error.code === "ECONNABORTED") {
+        showError("Сервер не отвечает. Попробуйте позже.");
+      } else {
+        showError(
+          error.response?.data?.error || "Ошибка регистрации. Проверьте данные."
+        );
+      }
     } finally {
       setUiState((prev) => ({ ...prev, isSubmitting: false }));
     }
   };
-
   const isFormValid =
     formData.firstName &&
     formData.lastName &&
