@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
-import '../../styles/account.css'
+import '../../styles/account.css';
 
 const AdminAccountHeader = ({ userId }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -25,6 +25,7 @@ const AdminAccountHeader = ({ userId }) => {
         } else {
             setIsMenuOpen(true);
             setIsClosing(false);
+            document.body.style.overflow = 'hidden'; 
         }
     };
 
@@ -33,24 +34,98 @@ const AdminAccountHeader = ({ userId }) => {
         setTimeout(() => {
             setIsMenuOpen(false);
             setIsClosing(false);
+            document.body.style.overflow = '';
         }, 500);
     };
-    
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape' && isMenuOpen) {
+                closeMenu();
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [isMenuOpen]);
+
     return (
-        <header className="account-header">
-            <button className="burger-menu" onClick={toggleMenu}>
-                <span className="burger-line"></span>
-                <span className="burger-line"></span>
-                <span className="burger-line"></span>
+        <header className="account-header" role="banner">
+            <button 
+                className="burger-menu" 
+                onClick={toggleMenu}
+                aria-label={isMenuOpen ? "Закрыть меню" : "Открыть меню"}
+                aria-expanded={isMenuOpen}
+                aria-controls="main-navigation"
+            >
+                <span className="burger-line" aria-hidden="true"></span>
+                <span className="burger-line" aria-hidden="true"></span>
+                <span className="burger-line" aria-hidden="true"></span>
             </button>
 
-            <nav className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
-                <NavLink to="/" onClick={goToHome}>Главная</NavLink>
-                <NavLink to={`/adminAccount/${userId}/intervals`}>Интервалы</NavLink>
-                <NavLink to={`/adminAccount/${userId}/bookings/upcoming`}>Бронирования</NavLink>
-                <NavLink to={`/adminAccount/${userId}/discountsManager/new-discount`}>Акции</NavLink>
-                <NavLink to={`/adminAccount/${userId}/editProfile`}>Профиль</NavLink>
+            <nav 
+                id="main-navigation"
+                className={`nav-links ${isMenuOpen ? 'active' : ''} ${isClosing ? 'closing' : ''}`}
+                aria-label="Основная навигация"
+            >
+                <ul>
+                    <li>
+                        <NavLink 
+                            to="/" 
+                            onClick={goToHome}
+                            className={({ isActive }) => isActive ? 'active' : ''}
+                            aria-current={({ isActive }) => isActive ? 'page' : null}
+                        >
+                            Главная
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink 
+                            to={`/adminAccount/${userId}/intervals`}
+                            className={({ isActive }) => isActive ? 'active' : ''}
+                            aria-current={({ isActive }) => isActive ? 'page' : null}
+                        >
+                            Интервалы
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink 
+                            to={`/adminAccount/${userId}/bookings/upcoming`}
+                            className={({ isActive }) => isActive ? 'active' : ''}
+                            aria-current={({ isActive }) => isActive ? 'page' : null}
+                        >
+                            Бронирования
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink 
+                            to={`/adminAccount/${userId}/discountsManager/new-discount`}
+                            className={({ isActive }) => isActive ? 'active' : ''}
+                            aria-current={({ isActive }) => isActive ? 'page' : null}
+                        >
+                            Акции
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink 
+                            to={`/adminAccount/${userId}/editProfile`}
+                            className={({ isActive }) => isActive ? 'active' : ''}
+                            aria-current={({ isActive }) => isActive ? 'page' : null}
+                        >
+                            Профиль
+                        </NavLink>
+                    </li>
+                </ul>
             </nav>
+
+            {isMenuOpen && (
+                <div 
+                    className="menu-backdrop" 
+                    onClick={closeMenu}
+                    role="presentation"
+                    aria-hidden="true"
+                />
+            )}
         </header>
     );
 };

@@ -1,40 +1,64 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
-import { Outlet, NavLink } from 'react-router-dom';
-import '../../styles/nav.css'
-import '../../styles/account.css'
-
+import React, { useState, useEffect, useCallback } from "react";
+import axios from "axios";
+import { Outlet, NavLink } from "react-router-dom";
+import "../../styles/nav.css";
+import "../../styles/account.css";
 
 const Bookings = ({ userId, token }) => {
-    const [bookings, setBookings] = useState([]);
-    const apiUrl = import.meta.env.VITE_API_URL; 
-    const fetchBookings = useCallback(async () => {
-        try {
-            const response = await axios.get(`https://api.dom-ban-na-drovah.ru/api/adminAccount/${userId}/bookings`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setBookings(response.data);
-            console.error(response.data);
-
-        } catch (error) {
-            console.error('Ошибка при получении бронирований:', error);
+  const [bookings, setBookings] = useState([]);
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const fetchBookings = useCallback(async () => {
+    try {
+      const response = await axios.get(
+        `https://api.dom-ban-na-drovah.ru/api/adminAccount/${userId}/bookings`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
         }
-    }, [userId, token]);
+      );
+      setBookings(response.data);
+      console.error(response.data);
+    } catch (error) {
+      console.error("Ошибка при получении бронирований:", error);
+    }
+  }, [userId, token]);
 
-    useEffect(() => {
-        fetchBookings();
-    }, [fetchBookings]);
+  useEffect(() => {
+    fetchBookings();
+  }, [fetchBookings]);
 
-    return (
-        <div className='account-content'>
-                <nav className='nav'>
-                    <NavLink to={'upcoming'} className={({ isActive }) => { return isActive ? 'nav-link active' : 'nav-link' }}>Актуальные бронирования</NavLink>
-                    <NavLink to={'past'} className={({ isActive }) => { return isActive ? 'nav-link active' : 'nav-link' }}>Прошедшие бронирования</NavLink>
-                </nav>
-            <Outlet context={{ bookings }} />
-
-        </div>
-    );
+  return (
+    <div className="account-content">
+      <nav className="nav" aria-label="Меню бронирований">
+        <ul>
+          <li>
+            <NavLink
+              to={"upcoming"}
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+              aria-current={({ isActive }) => (isActive ? "page" : null)}
+            >
+              Актуальные бронирования
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to={"past"}
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+              aria-current={({ isActive }) => (isActive ? "page" : null)}
+            >
+              Прошедшие бронирования
+            </NavLink>
+          </li>
+        </ul>
+      </nav>
+      <main className="content" role="main">
+        <Outlet context={{ bookings }} />
+      </main>
+    </div>
+  );
 };
 
 export default Bookings;

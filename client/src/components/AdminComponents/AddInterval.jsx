@@ -31,7 +31,6 @@ export default function AddInterval() {
     const apiUrl = import.meta.env.VITE_API_URL; 
     const fetchAvailableIntervals = async () => {
         try {
-            console.log("Запрос интервалов на дату: ", bookingDateStart);
             const response = await axios.get(`https://api.dom-ban-na-drovah.ru/api/adminAccount/${userId}/availableIntervals/${bookingDateStart}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -45,13 +44,11 @@ export default function AddInterval() {
             setStartTime('');
             setEndTime('');
         } catch (err) {
-            console.error("Ошибка при получении доступных интервалов:", err);
             showError("Ошибка при получении доступных интервалов.");
         }
     };
 
     useEffect(() => {
-        console.log(intervals)
         if (bookingDateStart) {
             fetchAvailableIntervals();
         }
@@ -116,7 +113,6 @@ export default function AddInterval() {
                         end_time: response.data.interval.end_time
                     };
                 } else {
-                    console.error("Ошибка: interval не найден в ответе", response.data);
                     return null;
                 }
             }).filter(interval => interval !== null);
@@ -186,7 +182,7 @@ export default function AddInterval() {
                             options={startTimeOptions}
                             classNamePrefix="time-select"
                             placeholder="Выбрать время"
-                            isDisabled={startTimeOptions.length === 0} // Блокируем, если нет опций
+                            isDisabled={startTimeOptions.length === 0} 
                         />
                     </div>
                     <div className='time-select'>
@@ -198,7 +194,7 @@ export default function AddInterval() {
                             options={endTimeOptions}
                             classNamePrefix="time-select"
                             placeholder="Выбрать время"
-                            isDisabled={endTimeOptions.length === 0} // Блокируем, если нет опций
+                            isDisabled={endTimeOptions.length === 0} 
 
                         />
                     </div>
