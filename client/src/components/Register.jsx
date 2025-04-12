@@ -109,6 +109,9 @@ function Register() {
         `https://api.dom-ban-na-drovah.ru/api/register`,
         {
           phone_number: cleanPhone,
+        },
+        {
+          withCredentials: true,
         }
       );
 
@@ -149,7 +152,9 @@ function Register() {
           phone_number: cleanPhone,
           verification_code: formData.verificationCode,
         },
-        { timeout: 10000 }
+        {
+          withCredentials: true,
+        }
       );
 
       if (response.status === 201) {
