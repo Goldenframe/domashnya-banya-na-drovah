@@ -71,9 +71,9 @@ export default function UpcomingBookings() {
                             <th>Начало</th>
                             <th>Конец</th>
                             <th>Веники</th>
-                            <th>Полотенца</th>
+                            <th>Полот.</th>
                             <th>Шапки</th>
-                            <th>Простыни</th>
+                            <th>Прост.</th>
                             <th onClick={() => handleSort('price')} className="sortable">
                                 Цена
                                 <FontAwesomeIcon
@@ -87,7 +87,7 @@ export default function UpcomingBookings() {
                     <tbody>
                         {sortedBookings.map(booking => (
                             <tr key={booking.booking_id}>
-                                <td data-label="ID">{booking.booking_id}</td>
+                                <td data-label="ID"  className='td-header'>{booking.booking_id}</td>
                                 <td data-label="Гость">{(booking.first_name && booking.last_name) ? `${booking.first_name} ${booking.last_name}` : 'Гость удален'}</td>
                                 <td data-label="Тип гостя">{booking.user_type}</td>
                                 <td data-label="Дата">{new Date(booking.booking_date).toLocaleDateString('ru-RU')}</td>

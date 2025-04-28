@@ -40,7 +40,7 @@ const EditProfile = ({ userId, token, updateUserData }) => {
   const { message, showMessage, error, showError, isVisible } =
     useShowMessage();
   const navigate = useNavigate();
-  const apiUrl = import.meta.env.VITE_API_URL; 
+  const apiUrl = import.meta.env.VITE_API_URL;
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -100,9 +100,12 @@ const EditProfile = ({ userId, token, updateUserData }) => {
         return;
       }
 
-      const response = await axios.delete(`https://api.dom-ban-na-drovah.ru/api/userAccount/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.delete(
+        `https://api.dom-ban-na-drovah.ru/api/userAccount/${userId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       showMessage(response.data.message);
 
       Cookies.remove("token");
@@ -464,7 +467,7 @@ const EditProfile = ({ userId, token, updateUserData }) => {
 
   return (
     <>
-      <div
+      <main
         className="auth-block edit"
         role="main"
         aria-labelledby="profile-heading"
@@ -787,7 +790,7 @@ const EditProfile = ({ userId, token, updateUserData }) => {
             </div>
           </form>
         </div>
-      </div>
+      </main>
       {isModalOpen && (
         <div
           className="modal-delete"

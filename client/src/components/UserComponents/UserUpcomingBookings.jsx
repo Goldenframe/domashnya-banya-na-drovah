@@ -75,7 +75,7 @@ export default function UserUpcomingBookings() {
     };
 
     return (
-        <div className='table-container'>
+        <main className='table-container'>
             {(message || error) && sortedBookings.length > 0 && (
                 <p className={`auth-message ${error ? "error" : "success"} ${isVisible ? "fade-in" : "fade-out"}`} role="alert">
                     {message || error}
@@ -109,7 +109,7 @@ export default function UserUpcomingBookings() {
                     <tbody>
                         {sortedBookings.map(booking => (
                             <tr key={booking.booking_id}>
-                                <td data-label="Дата">{new Date(booking.booking_date).toLocaleDateString('ru-RU')}</td>
+                                <td data-label="Дата" className='td-header'>{new Date(booking.booking_date).toLocaleDateString('ru-RU')}</td>
                                 <td data-label="Начало">{new Date(booking.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
                                 <td data-label="Конец">{new Date(booking.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
                                 <td data-label="Веники">{booking.broom ? booking.broom_quantity : <span className='not-selected'>0</span>}</td>
@@ -130,6 +130,6 @@ export default function UserUpcomingBookings() {
                     <p className='empty-list'>Бронирований нет.</p>
                 </div>
             )}
-        </div>
+        </main>
     );
 }

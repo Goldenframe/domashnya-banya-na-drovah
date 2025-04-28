@@ -2,6 +2,7 @@ import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { Link, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import Loader from '../Loader.jsx';
 import Cookies from 'js-cookie';
+import UserFooter from './UserFooter.jsx';
 
 const BookingForm = lazy(() => import('./BookingForm.jsx'));
 const UserBookings = lazy(() => import('./UserBookings.jsx'));
@@ -51,7 +52,7 @@ function UserAccount() {
             <Suspense fallback={<Loader />}>
                 <UserAccountHeader userId={userData.userId} />
             </Suspense>
-            <div className="account-container">
+            <main className="account-container">
                 <Suspense fallback={<Loader />}>
                     <Routes>
                         <Route path="/" element={<Navigate to="/" />} />
@@ -64,7 +65,9 @@ function UserAccount() {
                         <Route path="*" element={<Navigate to={`/`} />} />
                     </Routes>
                 </Suspense>
-            </div>
+            </main>
+            <UserFooter userId={userData.userId} />
+
         </div>
     );
 }

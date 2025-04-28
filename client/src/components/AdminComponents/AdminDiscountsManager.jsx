@@ -8,11 +8,10 @@ const AdminDiscountsManager = ({ userId, token }) => {
     const [discounts, setDiscounts] = useState([]);
     const [currentDiscount, setCurrentDiscount] = useState(null);
     const navigate = useNavigate();
-    const apiUrl = import.meta.env.VITE_API_URL;
 
     const handleEditDiscount = (discount) => {
         setCurrentDiscount(discount);
-        navigate(`/adminAccount/${userId}/discountsManager/new-discount`, { 
+        navigate(`https://api.dom-ban-na-drovah.ru/api/adminAccount/${userId}/discountsManager/new-discount`, { 
             state: { discount }, 
             replace: true 
         });
@@ -42,7 +41,6 @@ const AdminDiscountsManager = ({ userId, token }) => {
             console.error("Ошибка при загрузке скидок:", error);
         }
     };
-
     return (
         <div className='account-content'>
             <nav className='nav' aria-label="Меню управления скидками">

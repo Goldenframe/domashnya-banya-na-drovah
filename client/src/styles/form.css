@@ -17,14 +17,31 @@
 
 .text-secondary {
   color: #9e835e;
+  font-size: 18px;
 }
 
-.date-selection-method {
+fieldset.date-selection-method {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0; /* Важно для правильного отображения в Firefox */
   width: 490px;
   text-align: center;
   margin: 10px 0 30px 0;
 }
 
+fieldset.date-selection-method legend {
+  display: contents; /* Позволяет legend участвовать в потоке без бокса */
+  width: 100%;
+  text-align: center;
+  font-size: inherit;
+  font-weight: normal;
+  color: inherit;
+  padding: 0;
+  margin: 0;
+}
+
+/* Ваши существующие стили кнопок (оставляем без изменений) */
 .mode-btn {
   background: none;
   border: none;
@@ -45,6 +62,10 @@
   color: #63523b;
 }
 
+/* Дополнительный стиль для контейнера кнопок */
+.method-buttons {
+  display: inline-block; /* или flex, если нужно */
+}
 .time-select__control {
   -webkit-appearance: none !important;
   -moz-appearance: none !important;
@@ -243,12 +264,7 @@ textarea::-webkit-scrollbar {
     font-size: 17px;
   }
 
-  .mode-btn {
-    font-size: 17px;
-  }
-
   .form-button {
-    font-size: 17px;
     padding: 12px 25px;
   }
   .align-left {
@@ -257,19 +273,14 @@ textarea::-webkit-scrollbar {
     padding: 0;
   }
 
-  .date-selection-method {
+  fieldset.date-selection-method {
     width: 450px;
   }
 }
 
 @media (max-width: 1190px) {
-  /* .form-wrapper {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-start;
-  } */
 
-  .date-selection-method {
+  fieldset.date-selection-method {
     width: 400px;
   }
 
@@ -278,16 +289,11 @@ textarea::-webkit-scrollbar {
     padding: 0 0 0 40px;
   }
 
-  /* .form-wrapper .time-controls {
-    justify-content: center;
-    align-items: flex-end;
-  } */
-
   .form-label {
     font-size: 17px;
   }
 
-  .mode-btn {
+  .mode-btn, .text-secondary {
     font-size: 17px;
   }
 
@@ -312,9 +318,6 @@ textarea::-webkit-scrollbar {
     margin-left: auto;
     padding: 0;
   }
-  .date-selection-method {
-    width: 400px;
-  }
 }
 
 @media (max-width: 1090px) {
@@ -322,7 +325,7 @@ textarea::-webkit-scrollbar {
     flex-direction: row;
   }
 
-  .date-selection-method {
+  fieldset.date-selection-method {
     width: 370px;
   }
 
@@ -351,7 +354,7 @@ textarea::-webkit-scrollbar {
 }
 
 @media (max-width: 980px) {
-  .date-selection-method {
+  fieldset.date-selection-method {
     width: 340px;
     font-size: 16px;
   }
@@ -389,17 +392,17 @@ textarea::-webkit-scrollbar {
 }
 
 @media (max-width: 880px) {
-  .form-label{
+  .form-label {
     font-size: 16px;
   }
 
-  .date-selection-method {
+  fieldset.date-selection-method {
     width: 320px;
     font-size: 16px;
     margin: 10px 0 15px 0;
   }
 
-  .mode-btn {
+  .mode-btn, .text-secondary {
     font-size: 16px;
   }
 
@@ -436,7 +439,7 @@ textarea::-webkit-scrollbar {
     padding: 10px 20px;
   }
 
-  .time-controls .form-label{
+  .time-controls .form-label {
     margin: 5px 0;
   }
 }
@@ -452,7 +455,7 @@ textarea::-webkit-scrollbar {
     padding: 0 0 0 40px;
   }
 
-  .form-wrapper .time-controls{
+  .form-wrapper .time-controls {
     padding: 0;
     margin: 0;
   }
@@ -466,10 +469,14 @@ textarea::-webkit-scrollbar {
     margin-left: auto;
     padding: 0;
   }
+
+  fieldset.date-selection-method {
+    width: 300px;
+  }
 }
 
 @media (max-width: 650px) {
-  .date-selection-method {
+  fieldset.date-selection-method {
     width: 100%;
     max-width: 340px;
     margin: 15px auto;
@@ -505,6 +512,10 @@ textarea::-webkit-scrollbar {
     align-items: center;
   }
 
+  .form-wrapper .time-controls {
+    margin: 20px 0 0 0;
+  }
+
   .time-select__control {
     padding: 6px 10px !important;
   }
@@ -513,17 +524,17 @@ textarea::-webkit-scrollbar {
     padding: 10px;
   }
 
-  .form-label{
+  .form-label {
     font-size: 18px;
   }
-  
-  .mode-btn{
+
+  .mode-btn, .text-secondary {
     font-size: 18px;
   }
 }
 
 @media (max-width: 480px) {
-  .date-selection-method {
+  fieldset.date-selection-method {
     width: 100%;
     max-width: 320px;
     margin: 15px auto;
@@ -564,7 +575,7 @@ textarea::-webkit-scrollbar {
     font-size: 15px;
   }
 
-  .mode-btn {
+  .mode-btn, .text-secondary {
     font-size: 14px;
   }
 

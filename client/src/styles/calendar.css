@@ -1,12 +1,10 @@
-
-
 .calendar-container {
   flex: 1;
 }
 
 .calendar_container {
   width: 490px;
-  box-sizing: border-box; 
+  box-sizing: border-box;
   border: none;
   margin-bottom: 40px;
 }
@@ -14,15 +12,15 @@
 .calendar_header {
   display: flex;
   align-items: center;
-  justify-content: space-between; 
-  background-color: #63523B;
-  color: #FFFDF9;
-  padding: 20px 40px; 
+  justify-content: space-between;
+  background-color: #63523b;
+  color: #fffdf9;
+  padding: 20px 40px;
 }
 
 .calendar_header span {
   font-size: 20px;
-  font-family: 'TriodPostnaja', sans-serif;
+  font-family: "TriodPostnaja", sans-serif;
   text-align: center;
   flex-grow: 1;
 }
@@ -33,8 +31,8 @@
   grid-template-columns: repeat(7, 1fr);
   border: 1px solid rgba(158, 131, 94, 0.5);
   font-weight: bold;
-  color: #9E835E;
-  background-color: #FFFDF9;
+  color: #9e835e;
+  background-color: #fffdf9;
 }
 
 .calendar div {
@@ -52,41 +50,41 @@
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  font-family: 'Manrope-VariableFont_wght', sans-serif;
+  font-family: "Manrope-VariableFont_wght", sans-serif;
 }
 
-.calendar div:nth-child(-n+7) {
-  font-family: 'TriodPostnaja', sans-serif;
-  color: #9E835E;
+.calendar div:nth-child(-n + 7) {
+  font-family: "TriodPostnaja", sans-serif;
+  color: #9e835e;
 }
 
 .calendar_day.interval {
-  background-color: #FFFDF9;
-  color: #9E835E;
+  background-color: #fffdf9;
+  color: #9e835e;
 }
 
 .calendar_day.past {
-  background-color: #F5F1EA;
+  background-color: #f5f1ea;
   color: rgba(158, 131, 94, 0.5);
   cursor: default;
 }
 
 .calendar_day.no-interval {
-  background-color: #F5F1EA; 
-  color: rgba(158, 131, 94, 0.5); 
-  cursor: pointer; 
+  background-color: #f5f1ea;
+  color: rgba(158, 131, 94, 0.5);
+  cursor: pointer;
 }
 
-.calendar_day.selected, 
-.calendar_day.start { 
-  background-color: #9E835E !important;
-  color: #FFFDF9 !important;
+.calendar_day.selected,
+.calendar_day.start {
+  background-color: #9e835e !important;
+  color: #fffdf9 !important;
 }
 
 .arrow-button {
   cursor: pointer;
   background-color: transparent;
-  color: #FFFDF9;
+  color: #fffdf9;
   font-size: 1.5em; /* Увеличиваем размер стрелочек */
   padding: 0;
   margin: 0;
@@ -94,7 +92,6 @@
 }
 
 @media (max-width: 1264px) {
-
   .calendar_container {
     width: 450px;
     margin-bottom: 20px;
@@ -120,14 +117,9 @@
 @media (max-width: 1190px) {
   .calendar_container {
     align-items: center;
-    width: 400px; 
+    width: 400px;
   }
-
-  .calendar_header span {
-    font-size: 16px;
-  }
-
-  .calendar div{
+  .calendar div {
     font-size: 14px;
     height: 50px;
   }
@@ -135,20 +127,15 @@
   .calendar_day {
     font-size: 14px;
   }
-
 }
 
 @media (max-width: 1090px) {
   .calendar_container {
     align-items: center;
-    width: 360px; 
+    width: 360px;
   }
 
-  .calendar_header span {
-    font-size: 17px;
-  }
-
-  .calendar div{
+  .calendar div {
     font-size: 14px;
     height: 45px;
   }
@@ -156,20 +143,15 @@
   .calendar_day {
     font-size: 14px;
   }
-
 }
 
 @media (max-width: 980px) {
   .calendar_container {
     align-items: center;
-    max-width: 340px; 
+    max-width: 340px;
   }
 
-  .calendar_header span {
-    font-size: 16px;
-  }
-
-  .calendar div{
+  .calendar div {
     font-size: 14px;
     height: 40px;
   }
@@ -177,20 +159,23 @@
   .calendar_day {
     font-size: 14px;
   }
-
 }
 
 @media (max-width: 880px) {
   .calendar_container {
     align-items: center;
-    max-width: 320px; 
+    max-width: 320px;
   }
 
+  .calendar_header {
+    padding: 15px 30px;
+    font-size: 16px;
+  }
   .calendar_header span {
     font-size: 16px;
   }
 
-  .calendar div{
+  .calendar div {
     font-size: 14px;
     height: 38px;
   }
@@ -198,15 +183,12 @@
   .calendar_day {
     font-size: 14px;
   }
-
 }
 
 @media (max-width: 780px) {
   .calendar_container {
-    max-width: 300px; 
+    max-width: 300px;
   }
-
-
 }
 
 @media (max-width: 650px) {
@@ -217,7 +199,7 @@
     margin: 0 auto; /* Выравниваем по центру */
   }
 
-  .calendar div{
+  .calendar div {
     height: 45px;
   }
   .calendar_header span {
@@ -240,7 +222,7 @@
     font-size: 16px;
   }
 
-  .calendar div{
+  .calendar div {
     font-size: 14px;
     height: 40px;
   }

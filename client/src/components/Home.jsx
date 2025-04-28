@@ -5,6 +5,13 @@ import { decodeToken } from "react-jwt";
 import AdminAccountHeader from "./AdminComponents/AdminAccountHeader.jsx";
 import UserAccount from "./UserComponents/UserAccount.jsx";
 import "../styles/account.css";
+import HeroSection from "./HomePage/HeroSection.jsx";
+import GallerySlider from "./HomePage/GallerySlider.jsx";
+import BathRental from "./HomePage/BathRental.jsx";
+import BookingTerms from "./HomePage/BookingTerms.jsx";
+import VirtualTour from "./HomePage/VirtualTour.jsx";
+import GuestHeader from "./GuestHeader.jsx";
+import Footer from "./Footer.jsx";
 
 function Home() {
   const [userData, setUserData] = useState(null);
@@ -24,30 +31,30 @@ function Home() {
     }
   }, []);
 
-
   return (
-    <div className="home-container">
-      {userData ? (
-        <>
-          <div className="home-links">
-            {userData.role === "admin" ? (
-              <AdminAccountHeader userId={userData.userId} />
-            ) : (
-              <UserAccount userId={userData.userId} />
-            )}
-          </div>
-        </>
-      ) : (
-        <>
-          <div className="account-header">
-            <Link to="/login" className="home-button">
-              Войти
-            </Link>
-          </div>
-        </>
-      )}
-      <p>Главная страница</p>
-    </div>
+    <>
+      <main className="home-container">
+        {userData ? (
+          <>
+            <div>
+              {userData.role === "admin" ? (
+                <AdminAccountHeader userId={userData.userId} />
+              ) : (
+                <UserAccount userId={userData.userId} />
+              )}
+            </div>
+          </>
+        ) : (
+          <GuestHeader />
+        )}
+        <HeroSection />
+        <GallerySlider />
+        <BathRental />
+        <BookingTerms />
+        <VirtualTour />
+      </main>
+      <Footer />
+    </>
   );
 }
 

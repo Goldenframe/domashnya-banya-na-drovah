@@ -21,9 +21,9 @@ function Login() {
     useShowMessage();
   const navigate = useNavigate();
   const apiUrl = import.meta.env.VITE_API_URL;
+
   const formatPhoneNumber = (value) => {
     const cleaned = value.replace(/\D/g, "");
-
     const limited = cleaned.slice(0, 11);
 
     let formatted = limited;
@@ -166,11 +166,17 @@ function Login() {
 
   const isButtonDisabled = !(getCleanPhoneNumber().length >= 11) || !password;
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !isButtonDisabled) {
+      login();
+    }
+  };
+
   return (
-    <div className="auth-container">
+    <main className="auth-container">
       <div className="auth-block log">
         <div className="auth-content">
-          <h2 className="auth-title">ВХОД</h2>
+          <h1 className="auth-title">ВХОД</h1>
 
           {(message || error) && (
             <p
@@ -201,6 +207,7 @@ function Login() {
                 aria-describedby="phoneError"
                 required
                 maxLength={18}
+                onKeyDown={handleKeyDown}
               />
               {inputError.phone && (
                 <span id="phoneError" className="error-message">
@@ -229,6 +236,7 @@ function Login() {
                   maxLength={16}
                   aria-describedby="passwordError"
                   required
+                  onKeyDown={handleKeyDown}
                 />
                 <FontAwesomeIcon
                   icon={showPassword ? faEyeSlash : faEye}
@@ -277,7 +285,7 @@ function Login() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 

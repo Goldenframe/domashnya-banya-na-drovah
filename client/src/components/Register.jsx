@@ -11,8 +11,10 @@ const usePasswordToggle = (initialState = false) => {
   const [visible, setVisible] = useState(initialState);
 
   const toggle = () => setVisible(!visible);
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
       toggle();
     }
   };
@@ -48,26 +50,18 @@ function Register() {
   const { message, showMessage, error, showError, isVisible } =
     useShowMessage();
   const apiUrl = import.meta.env.VITE_API_URL;
+
   const formatPhoneNumber = (value) => {
     const cleaned = value.replace(/\D/g, "");
-
     const limited = cleaned.slice(0, 11);
 
     let formatted = limited;
     if (limited.length > 0) {
       formatted = `+7 (`;
-      if (limited.length > 1) {
-        formatted += `${limited.slice(1, 4)}`;
-      }
-      if (limited.length > 4) {
-        formatted += `) ${limited.slice(4, 7)}`;
-      }
-      if (limited.length > 7) {
-        formatted += `-${limited.slice(7, 9)}`;
-      }
-      if (limited.length > 9) {
-        formatted += `-${limited.slice(9)}`;
-      }
+      if (limited.length > 1) formatted += `${limited.slice(1, 4)}`;
+      if (limited.length > 4) formatted += `) ${limited.slice(4, 7)}`;
+      if (limited.length > 7) formatted += `-${limited.slice(7, 9)}`;
+      if (limited.length > 9) formatted += `-${limited.slice(9)}`;
     }
 
     return formatted;
@@ -91,7 +85,7 @@ function Register() {
     return cleanPhone.length === 10 ? "7" + cleanPhone : cleanPhone;
   };
 
-  const handleInputChange = (e, fieldName) => {
+  const handleInputChange = (e) => {
     const { id, value } = e.target;
     if (id === "phoneNumber") {
       handlePhoneChange(e);
@@ -179,6 +173,7 @@ function Register() {
       setUiState((prev) => ({ ...prev, isSubmitting: false }));
     }
   };
+
   const isFormValid =
     formData.firstName &&
     formData.lastName &&
@@ -188,21 +183,28 @@ function Register() {
 
   const isVerificationFormValid = formData.verificationCode.length === 4;
 
+  const handleButtonKeyDown = (e, callback) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      callback();
+    }
+  };
+
   const renderPasswordIcon = (toggleProps) => (
     <FontAwesomeIcon
       icon={toggleProps.icon}
       className="passwordIcon"
       onClick={toggleProps.toggle}
-      aria-label={toggleProps.visible ? "Скрыть пароль" : "Показать пароль"}
-      tabIndex="0"
       onKeyDown={toggleProps.handleKeyDown}
+      tabIndex="0"
       role="button"
+      aria-label={toggleProps.visible ? "Скрыть пароль" : "Показать пароль"}
       aria-pressed={toggleProps.visible}
     />
   );
 
   return (
-    <div
+    <main
       className="auth-container"
       role="region"
       aria-labelledby="registerTitle"
@@ -213,9 +215,9 @@ function Register() {
         aria-labelledby="registerBlockLabel"
       >
         <div className="auth-content">
-          <h2 id="registerTitle" className="auth-title">
+          <h1 id="registerTitle" className="auth-title">
             РЕГИСТРАЦИЯ
-          </h2>
+          </h1>
 
           {(message || error) && (
             <p
@@ -227,6 +229,7 @@ function Register() {
               {message || error}
             </p>
           )}
+
           <div className="auth-form">
             <div className="auth-row">
               <div className="auth-column">
@@ -350,6 +353,16 @@ function Register() {
                       placeholder="Введите код"
                       maxLength={4}
                       onChange={(e) => handleInputChange(e, "Код верификации")}
+                      onKeyDown={(e) => {
+                        if (
+                          e.key === "Enter" &&
+                          isFormValid &&
+                          !uiState.isCodeSent
+                        ) {
+                          e.preventDefault();
+                          sendVerificationCode();
+                        }
+                      }}
                       value={formData.verificationCode}
                       required
                       aria-required="true"
@@ -369,6 +382,7 @@ function Register() {
             <button
               className="auth-button"
               onClick={sendVerificationCode}
+              onKeyDown={(e) => handleButtonKeyDown(e, sendVerificationCode)}
               disabled={!isFormValid || uiState.isSubmitting}
               aria-busy={uiState.isSubmitting}
               aria-live="polite"
@@ -386,6 +400,7 @@ function Register() {
               <button
                 className="auth-button"
                 onClick={sendVerificationCode}
+                onKeyDown={(e) => handleButtonKeyDown(e, sendVerificationCode)}
                 disabled={!isFormValid || uiState.isSubmitting}
                 aria-busy={uiState.isSubmitting}
                 aria-live="polite"
@@ -400,6 +415,7 @@ function Register() {
               <button
                 className="auth-button"
                 onClick={register}
+                onKeyDown={(e) => handleButtonKeyDown(e, register)}
                 disabled={!isVerificationFormValid || uiState.isSubmitting}
                 aria-busy={uiState.isSubmitting}
                 aria-live="polite"
@@ -411,6 +427,9 @@ function Register() {
                 <button
                   className="auth-button"
                   onClick={sendVerificationCode}
+                  onKeyDown={(e) =>
+                    handleButtonKeyDown(e, sendVerificationCode)
+                  }
                   disabled={uiState.isSubmitting}
                   aria-busy={uiState.isSubmitting}
                   aria-live="polite"
@@ -425,14 +444,13 @@ function Register() {
             <p>
               Уже есть учетная запись?
               <Link to="/login" className="auth-link">
-                {" "}
                 Войдите
               </Link>
             </p>
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 

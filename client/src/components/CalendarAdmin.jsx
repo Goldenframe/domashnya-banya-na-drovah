@@ -37,7 +37,6 @@ export default function CalendarAdmin({
     const allDaysInMonth = Array.from({ length: new Date(year, month + 1, 0).getDate() }, (_, i) => new Date(year, month, i + 1));
     const firstAvailableDateWeekday = firstOfMonth.getDay();
 
-    // Пустые клетки перед первым днем месяца
     const emptyCellsBeforeFirstAvailable = (firstAvailableDateWeekday + 6) % 7;
     for (let i = 0; i < emptyCellsBeforeFirstAvailable; i++) {
         calendarCells.push(

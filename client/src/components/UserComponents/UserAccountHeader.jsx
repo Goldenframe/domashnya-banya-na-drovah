@@ -1,55 +1,130 @@
-import React, { useState, useEffect } from 'react';
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import "../../styles/account.css";
 
 const UserAccountHeader = ({ userId }) => {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isClosing, setIsClosing] = useState(false);
-    const navigate = useNavigate();
-    const location = useLocation();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-    useEffect(() => {
-        if (isMenuOpen) {
-            closeMenu();
-        }
-    }, [location]);
+  useEffect(() => {
+    if (isMenuOpen) {
+      closeMenu();
+    }
+  }, [location]);
 
-    const goToHome = (e) => {
-        e.preventDefault();
-        navigate("/", { replace: true });
+  const goToHome = (e) => {
+    e.preventDefault();
+    closeMenu();
+    setTimeout(() => {
+      navigate("/");
+    }, 100);
+  };
+
+  const toggleMenu = () => {
+    if (isMenuOpen) {
+      closeMenu();
+    } else {
+      setIsMenuOpen(true);
+      setIsClosing(false);
+      document.body.style.overflow = "hidden";
+    }
+  };
+
+  const closeMenu = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setIsMenuOpen(false);
+      setIsClosing(false);
+      document.body.style.overflow = "";
+    }, 500);
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape" && isMenuOpen) {
+        closeMenu();
+      }
     };
 
-    const toggleMenu = () => {
-        if (isMenuOpen) {
-            closeMenu();
-        } else {
-            setIsMenuOpen(true);
-            setIsClosing(false);
-        }
-    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isMenuOpen]);
 
-    const closeMenu = () => {
-        setIsClosing(true);
-        setTimeout(() => {
-            setIsMenuOpen(false);
-            setIsClosing(false);
-        }, 500); 
-    };
+  return (
+    <div className="home-links">
+      <header className="account-header" role="banner">
+        <NavLink
+          to="/"
+          className="logo"
+          aria-current={({ isActive }) => (isActive ? "page" : null)}
+          onClick={goToHome}
+        >
+          ДомБан
+        </NavLink>
 
-    return (
-        <header className="account-header">
-            <button className="burger-menu" onClick={toggleMenu}>
-                <span className="burger-line"></span>
-                <span className="burger-line"></span>
-                <span className="burger-line"></span>
-            </button>
-            <nav className={`nav-links ${isMenuOpen ? 'active' : ''} ${isClosing ? 'closing' : ''}`}>
-                <NavLink to="/" onClick={goToHome}>Главная</NavLink>
-                <NavLink to={`/userAccount/${userId}/bookingForm`}>Оформить бронь</NavLink>
-                <NavLink to={`/userAccount/${userId}/bookings/upcoming`} style={{ paddingLeft: 15 }}>Ваши бронирования</NavLink>
-                <NavLink to={`/userAccount/${userId}/editProfile`} style={{ paddingLeft: 15 }}>Профиль</NavLink>
-            </nav>
-        </header>
-    );
+        <button
+          className="burger-menu"
+          onClick={toggleMenu}
+          aria-label={isMenuOpen ? "Закрыть меню" : "Открыть меню"}
+          aria-expanded={isMenuOpen}
+          aria-controls="main-navigation"
+        >
+          <span className="burger-line" aria-hidden="true"></span>
+          <span className="burger-line" aria-hidden="true"></span>
+          <span className="burger-line" aria-hidden="true"></span>
+        </button>
+
+        <nav
+          id="main-navigation"
+          className={`nav-links ${isMenuOpen ? "active" : ""} ${
+            isClosing ? "closing" : ""
+          }`}
+          aria-label="Основная навигация"
+        >
+          <ul>
+            <li>
+              <NavLink
+                to={`/userAccount/${userId}/bookingForm`}
+                className={({ isActive }) => (isActive ? "active" : "")}
+                aria-current={({ isActive }) => (isActive ? "page" : null)}
+              >
+                Оформить бронь
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to={`/userAccount/${userId}/bookings/upcoming`}
+                className={({ isActive }) => (isActive ? "active" : "")}
+                aria-current={({ isActive }) => (isActive ? "page" : null)}
+              >
+                Ваши бронирования
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to={`/userAccount/${userId}/editProfile`}
+                className={({ isActive }) => (isActive ? "active" : "")}
+                aria-current={({ isActive }) => (isActive ? "page" : null)}
+              >
+                Профиль
+              </NavLink>
+            </li>
+          </ul>
+        </nav>
+
+        {isMenuOpen && (
+          <div
+            className="menu-backdrop"
+            onClick={closeMenu}
+            role="presentation"
+            aria-hidden="true"
+          />
+        )}
+      </header>
+    </div>
+  );
 };
 
 export default UserAccountHeader;

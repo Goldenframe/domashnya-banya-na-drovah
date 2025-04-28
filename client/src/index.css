@@ -34,31 +34,6 @@ button{
 }
 
 
-
-.account-header {
-  background-color: #9E835E;
-  position: relative;
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 20px;
-  padding: 20px;
-}
-
-.account-header a {
-  text-decoration: none;
-  color: #f9f9f9;
-  transition: 0.3s;
-  font-size: 16px;
-}
-
-.account-header a:hover {
-  color: #FCF4E7;
-}
-
-nav a {
-  margin: 0 30px;
-}
-
 .account-actions {
   display: flex;
   justify-content: flex-end; /* Выравнивание кнопок вправо */

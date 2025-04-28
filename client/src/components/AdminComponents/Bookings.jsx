@@ -6,7 +6,6 @@ import "../../styles/account.css";
 
 const Bookings = ({ userId, token }) => {
   const [bookings, setBookings] = useState([]);
-  const apiUrl = import.meta.env.VITE_API_URL;
   const fetchBookings = useCallback(async () => {
     try {
       const response = await axios.get(
