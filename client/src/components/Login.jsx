@@ -3,10 +3,15 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { decodeToken } from "react-jwt";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import {
+  faEye,
+  faEyeSlash,
+  faArrowLeft,
+} from "@fortawesome/free-solid-svg-icons";
 import useShowMessage from "./useShowMessage";
 import Cookies from "js-cookie";
 import "../styles/auth.css";
+import "../styles/auth-background.css";
 
 function Login() {
   const [phone, setPhone] = useState("");
@@ -173,119 +178,133 @@ function Login() {
   };
 
   return (
-    <main className="auth-container">
-      <div className="auth-block log">
-        <div className="auth-content">
-          <h1 className="auth-title">ВХОД</h1>
+    <div className="auth-page auth-background">
+      <header className="auth-header">
+        <button
+          className="back-button"
+          onClick={() => navigate("/")}
+          aria-label="Вернуться на главную"
+        >
+          <FontAwesomeIcon icon={faArrowLeft} />
+          <span>На главную</span>
+        </button>
+      </header>
+      <main className="auth-container">
+        <div className="auth-block log">
+          <div className="auth-content">
+            <h1 className="auth-title">ВХОД</h1>
 
-          {(message || error) && (
-            <p
-              className={`auth-message ${error ? "error" : "success"} ${
-                isVisible ? "fade-in" : "fade-out"
-              }`}
-              role="alert"
-            >
-              {message || error}
-            </p>
-          )}
-
-          <div className="auth-form">
-            <label
-              className={`auth-label ${inputError.phone ? "error-label" : ""}`}
-              htmlFor="phone"
-            >
-              Номер телефона
-              <input
-                type="tel"
-                id="phone"
-                className={`auth-input ${
-                  inputError.phone ? "error-input" : ""
+            {(message || error) && (
+              <p
+                className={`auth-message ${error ? "error" : "success"} ${
+                  isVisible ? "fade-in" : "fade-out"
                 }`}
-                placeholder="+7 (XXX) XXX-XX-XX"
-                onChange={handlePhoneChange}
-                value={phone}
-                aria-describedby="phoneError"
-                required
-                maxLength={18}
-                onKeyDown={handleKeyDown}
-              />
-              {inputError.phone && (
-                <span id="phoneError" className="error-message">
-                  Неверный номер телефона
-                </span>
-              )}
-            </label>
+                role="alert"
+              >
+                {message || error}
+              </p>
+            )}
 
-            <label
-              className={`auth-label ${
-                inputError.password ? "error-label" : ""
-              }`}
-              htmlFor="password"
-            >
-              Пароль
-              <div className="passwordInput">
+            <div className="auth-form">
+              <label
+                className={`auth-label ${
+                  inputError.phone ? "error-label" : ""
+                }`}
+                htmlFor="phone"
+              >
+                Номер телефона
                 <input
-                  type={showPassword ? "text" : "password"}
-                  id="password"
+                  type="tel"
+                  id="phone"
                   className={`auth-input ${
-                    inputError.password ? "error-input" : ""
+                    inputError.phone ? "error-input" : ""
                   }`}
-                  placeholder="Введите пароль"
-                  onChange={(e) => setPassword(e.target.value)}
-                  value={password}
-                  maxLength={16}
-                  aria-describedby="passwordError"
+                  placeholder="+7 (XXX) XXX-XX-XX"
+                  onChange={handlePhoneChange}
+                  value={phone}
+                  aria-describedby="phoneError"
                   required
+                  maxLength={18}
                   onKeyDown={handleKeyDown}
                 />
-                <FontAwesomeIcon
-                  icon={showPassword ? faEyeSlash : faEye}
-                  className="passwordIcon"
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={
-                    showPassword ? "Скрыть пароль" : "Показать пароль"
-                  }
-                  tabIndex="0"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      setShowPassword(!showPassword);
+                {inputError.phone && (
+                  <span id="phoneError" className="error-message">
+                    Неверный номер телефона
+                  </span>
+                )}
+              </label>
+
+              <label
+                className={`auth-label ${
+                  inputError.password ? "error-label" : ""
+                }`}
+                htmlFor="password"
+              >
+                Пароль
+                <div className="passwordInput">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    className={`auth-input ${
+                      inputError.password ? "error-input" : ""
+                    }`}
+                    placeholder="Введите пароль"
+                    onChange={(e) => setPassword(e.target.value)}
+                    value={password}
+                    maxLength={16}
+                    aria-describedby="passwordError"
+                    required
+                    onKeyDown={handleKeyDown}
+                  />
+                  <FontAwesomeIcon
+                    icon={showPassword ? faEyeSlash : faEye}
+                    className="passwordIcon"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={
+                      showPassword ? "Скрыть пароль" : "Показать пароль"
                     }
-                  }}
-                  role="button"
-                  aria-pressed={showPassword}
-                />
-              </div>
-              {inputError.password && (
-                <span id="passwordError" className="error-message">
-                  Неверный пароль
-                </span>
-              )}
-            </label>
+                    tabIndex="0"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        setShowPassword(!showPassword);
+                      }
+                    }}
+                    role="button"
+                    aria-pressed={showPassword}
+                  />
+                </div>
+                {inputError.password && (
+                  <span id="passwordError" className="error-message">
+                    Неверный пароль
+                  </span>
+                )}
+              </label>
 
-            <button
-              className="auth-button"
-              onClick={login}
-              disabled={isButtonDisabled}
-              aria-disabled={isButtonDisabled}
-            >
-              Войти
-            </button>
-          </div>
+              <button
+                className="auth-button"
+                onClick={login}
+                disabled={isButtonDisabled}
+                aria-disabled={isButtonDisabled}
+              >
+                Войти
+              </button>
+            </div>
 
-          <div className="auth-links">
-            <p>
-              Еще нет учетной записи?{" "}
-              <Link to="/register" className="auth-link">
-                Зарегистрируйтесь
+            <div className="auth-links">
+              <p>
+                Еще нет учетной записи?{" "}
+                <Link to="/register" className="auth-link">
+                  Зарегистрируйтесь
+                </Link>
+              </p>
+              <Link to="/forgot-password" className="auth-link">
+                Забыли пароль?
               </Link>
-            </p>
-            <Link to="/forgot-password" className="auth-link">
-              Забыли пароль?
-            </Link>
+            </div>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
 

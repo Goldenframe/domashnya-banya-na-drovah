@@ -1,0 +1,63 @@
+.auth-background {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  background: linear-gradient(rgba(29, 22, 16, 0.8), rgba(29, 22, 16, 0.8)),
+    url("../assets/img/2_4.webp") no-repeat bottom center fixed;
+  background-size: cover;
+  min-height: 80vh;
+    -webkit-backdrop-filter: blur(7px);
+  backdrop-filter: blur(7px); 
+}
+
+.auth-background .auth-block {
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+.auth-page {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-header {
+  padding: 10px 20px;
+  background-color: rgba(255, 253, 249, 1);
+  top: 0;
+  z-index: 100;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: #63523b;
+  font-size: 16px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.back-button:hover {
+  color: #9e835e;
+}
+
+.back-button svg {
+  font-size: 18px;
+}
+
+@media (max-width: 800px) {
+
+  .auth-background{
+    min-height: 115vh;
+  }
+
+  .auth-header{
+    position: sticky;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  }
+
+}

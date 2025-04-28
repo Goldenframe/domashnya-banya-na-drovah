@@ -2,10 +2,15 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import {
+  faEye,
+  faEyeSlash,
+  faArrowLeft,
+} from "@fortawesome/free-solid-svg-icons";
 import useShowMessage from "./useShowMessage.jsx";
 import Cookies from "js-cookie";
 import "../styles/auth.css";
+import "../styles/auth-background.css";
 
 const usePasswordToggle = (initialState = false) => {
   const [visible, setVisible] = useState(initialState);
@@ -204,199 +209,196 @@ function Register() {
   );
 
   return (
-    <main
-      className="auth-container"
-      role="region"
-      aria-labelledby="registerTitle"
-    >
-      <div
-        className="auth-block reg"
-        role="group"
-        aria-labelledby="registerBlockLabel"
+    <div className="auth-page auth-background">
+      <header className="auth-header">
+        <button
+          className="back-button"
+          onClick={() => navigate("/")}
+          aria-label="Вернуться на главную"
+        >
+          <FontAwesomeIcon icon={faArrowLeft} />
+          <span>На главную</span>
+        </button>
+      </header>
+      <main
+        className="auth-container"
+        role="region"
+        aria-labelledby="registerTitle"
       >
-        <div className="auth-content">
-          <h1 id="registerTitle" className="auth-title">
-            РЕГИСТРАЦИЯ
-          </h1>
+        <div
+          className="auth-block reg"
+          role="group"
+          aria-labelledby="registerBlockLabel"
+        >
+          <div className="auth-content">
+            <h1 id="registerTitle" className="auth-title">
+              РЕГИСТРАЦИЯ
+            </h1>
 
-          {(message || error) && (
-            <p
-              className={`auth-message ${error ? "error" : "success"} ${
-                isVisible ? "fade-in" : "fade-out"
-              }`}
-              role="alert"
-            >
-              {message || error}
-            </p>
-          )}
+            {(message || error) && (
+              <p
+                className={`auth-message ${error ? "error" : "success"} ${
+                  isVisible ? "fade-in" : "fade-out"
+                }`}
+                role="alert"
+              >
+                {message || error}
+              </p>
+            )}
 
-          <div className="auth-form">
-            <div className="auth-row">
-              <div className="auth-column">
-                <label className="auth-label" htmlFor="firstName">
-                  Имя
-                  <input
-                    type="text"
-                    id="firstName"
-                    className="auth-input"
-                    placeholder="Введите имя"
-                    maxLength={20}
-                    onChange={(e) => handleInputChange(e, "Имя")}
-                    value={formData.firstName}
-                    required
-                    aria-required="true"
-                    aria-describedby="firstNameError"
-                  />
-                  <span
-                    id="firstNameError"
-                    className="screen-reader-only"
-                  ></span>
-                </label>
-
-                <label className="auth-label" htmlFor="lastName">
-                  Фамилия
-                  <input
-                    type="text"
-                    id="lastName"
-                    className="auth-input"
-                    placeholder="Введите фамилию"
-                    maxLength={20}
-                    onChange={(e) => handleInputChange(e, "Фамилия")}
-                    value={formData.lastName}
-                    required
-                    aria-required="true"
-                    aria-describedby="lastNameError"
-                  />
-                  <span
-                    id="lastNameError"
-                    className="screen-reader-only"
-                  ></span>
-                </label>
-              </div>
-
-              <div className="auth-column">
-                <label className="auth-label" htmlFor="password">
-                  Пароль
-                  <div className="passwordInput">
-                    <input
-                      type={passwordToggle.type}
-                      id="password"
-                      className="auth-input"
-                      placeholder="Введите пароль"
-                      maxLength={16}
-                      onChange={(e) => handleInputChange(e, "Пароль")}
-                      value={formData.password}
-                      required
-                      aria-required="true"
-                      aria-describedby="passwordError"
-                    />
-                    {renderPasswordIcon(passwordToggle)}
-                  </div>
-                  <span
-                    id="passwordError"
-                    className="screen-reader-only"
-                  ></span>
-                </label>
-
-                <label className="auth-label" htmlFor="confirmPassword">
-                  Проверка пароля
-                  <div className="passwordInput">
-                    <input
-                      type={confirmPasswordToggle.type}
-                      id="confirmPassword"
-                      className="auth-input"
-                      placeholder="Повторите пароль"
-                      maxLength={16}
-                      onChange={(e) => handleInputChange(e, "Проверка пароля")}
-                      value={formData.confirmPassword}
-                      required
-                      aria-required="true"
-                      aria-describedby="confirmPasswordError"
-                    />
-                    {renderPasswordIcon(confirmPasswordToggle)}
-                  </div>
-                  <span
-                    id="confirmPasswordError"
-                    className="screen-reader-only"
-                  ></span>
-                </label>
-              </div>
-
-              <div className="auth-column">
-                <label className="auth-label" htmlFor="phoneNumber">
-                  Номер телефона
-                  <input
-                    type="tel"
-                    id="phoneNumber"
-                    className="auth-input"
-                    placeholder="+7 (XXX) XXX-XX-XX"
-                    maxLength={18}
-                    onChange={(e) => handleInputChange(e, "Номер телефона")}
-                    value={formData.phoneNumber}
-                    required
-                    aria-required="true"
-                    aria-describedby="phoneNumberError"
-                  />
-                  <span
-                    id="phoneNumberError"
-                    className="screen-reader-only"
-                  ></span>
-                </label>
-
-                {isFormValid && (
-                  <label className="auth-label" htmlFor="verificationCode">
-                    Код верификации
+            <div className="auth-form">
+              <div className="auth-row">
+                <div className="auth-column">
+                  <label className="auth-label" htmlFor="firstName">
+                    Имя
                     <input
                       type="text"
-                      id="verificationCode"
+                      id="firstName"
                       className="auth-input"
-                      placeholder="Введите код"
-                      maxLength={4}
-                      onChange={(e) => handleInputChange(e, "Код верификации")}
-                      onKeyDown={(e) => {
-                        if (
-                          e.key === "Enter" &&
-                          isFormValid &&
-                          !uiState.isCodeSent
-                        ) {
-                          e.preventDefault();
-                          sendVerificationCode();
-                        }
-                      }}
-                      value={formData.verificationCode}
+                      placeholder="Введите имя"
+                      maxLength={20}
+                      onChange={(e) => handleInputChange(e, "Имя")}
+                      value={formData.firstName}
                       required
                       aria-required="true"
-                      aria-describedby="verificationCodeError"
+                      aria-describedby="firstNameError"
                     />
                     <span
-                      id="verificationCodeError"
+                      id="firstNameError"
                       className="screen-reader-only"
                     ></span>
                   </label>
-                )}
+
+                  <label className="auth-label" htmlFor="lastName">
+                    Фамилия
+                    <input
+                      type="text"
+                      id="lastName"
+                      className="auth-input"
+                      placeholder="Введите фамилию"
+                      maxLength={20}
+                      onChange={(e) => handleInputChange(e, "Фамилия")}
+                      value={formData.lastName}
+                      required
+                      aria-required="true"
+                      aria-describedby="lastNameError"
+                    />
+                    <span
+                      id="lastNameError"
+                      className="screen-reader-only"
+                    ></span>
+                  </label>
+                </div>
+
+                <div className="auth-column">
+                  <label className="auth-label" htmlFor="password">
+                    Пароль
+                    <div className="passwordInput">
+                      <input
+                        type={passwordToggle.type}
+                        id="password"
+                        className="auth-input"
+                        placeholder="Введите пароль"
+                        maxLength={16}
+                        onChange={(e) => handleInputChange(e, "Пароль")}
+                        value={formData.password}
+                        required
+                        aria-required="true"
+                        aria-describedby="passwordError"
+                      />
+                      {renderPasswordIcon(passwordToggle)}
+                    </div>
+                    <span
+                      id="passwordError"
+                      className="screen-reader-only"
+                    ></span>
+                  </label>
+
+                  <label className="auth-label" htmlFor="confirmPassword">
+                    Проверка пароля
+                    <div className="passwordInput">
+                      <input
+                        type={confirmPasswordToggle.type}
+                        id="confirmPassword"
+                        className="auth-input"
+                        placeholder="Повторите пароль"
+                        maxLength={16}
+                        onChange={(e) =>
+                          handleInputChange(e, "Проверка пароля")
+                        }
+                        value={formData.confirmPassword}
+                        required
+                        aria-required="true"
+                        aria-describedby="confirmPasswordError"
+                      />
+                      {renderPasswordIcon(confirmPasswordToggle)}
+                    </div>
+                    <span
+                      id="confirmPasswordError"
+                      className="screen-reader-only"
+                    ></span>
+                  </label>
+                </div>
+
+                <div className="auth-column">
+                  <label className="auth-label" htmlFor="phoneNumber">
+                    Номер телефона
+                    <input
+                      type="tel"
+                      id="phoneNumber"
+                      className="auth-input"
+                      placeholder="+7 (XXX) XXX-XX-XX"
+                      maxLength={18}
+                      onChange={(e) => handleInputChange(e, "Номер телефона")}
+                      value={formData.phoneNumber}
+                      required
+                      aria-required="true"
+                      aria-describedby="phoneNumberError"
+                    />
+                    <span
+                      id="phoneNumberError"
+                      className="screen-reader-only"
+                    ></span>
+                  </label>
+
+                  {isFormValid && (
+                    <label className="auth-label" htmlFor="verificationCode">
+                      Код верификации
+                      <input
+                        type="text"
+                        id="verificationCode"
+                        className="auth-input"
+                        placeholder="Введите код"
+                        maxLength={4}
+                        onChange={(e) =>
+                          handleInputChange(e, "Код верификации")
+                        }
+                        onKeyDown={(e) => {
+                          if (
+                            e.key === "Enter" &&
+                            isFormValid &&
+                            !uiState.isCodeSent
+                          ) {
+                            e.preventDefault();
+                            sendVerificationCode();
+                          }
+                        }}
+                        value={formData.verificationCode}
+                        required
+                        aria-required="true"
+                        aria-describedby="verificationCodeError"
+                      />
+                      <span
+                        id="verificationCodeError"
+                        className="screen-reader-only"
+                      ></span>
+                    </label>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
 
-          {!uiState.isCodeSent && !isFormValid && (
-            <button
-              className="auth-button"
-              onClick={sendVerificationCode}
-              onKeyDown={(e) => handleButtonKeyDown(e, sendVerificationCode)}
-              disabled={!isFormValid || uiState.isSubmitting}
-              aria-busy={uiState.isSubmitting}
-              aria-live="polite"
-            >
-              Зарегистрироваться
-            </button>
-          )}
-
-          {isFormValid && !uiState.isCodeSent && (
-            <>
-              <p className="auth-info">
-                На Ваш номер телефона поступит звонок, введите последние 4 цифры
-                номера.
-              </p>
+            {!uiState.isCodeSent && !isFormValid && (
               <button
                 className="auth-button"
                 onClick={sendVerificationCode}
@@ -405,52 +407,75 @@ function Register() {
                 aria-busy={uiState.isSubmitting}
                 aria-live="polite"
               >
-                {uiState.isSubmitting ? "Отправка..." : "Отправить код"}
+                Зарегистрироваться
               </button>
-            </>
-          )}
+            )}
 
-          {uiState.isCodeSent && (
-            <>
-              <button
-                className="auth-button"
-                onClick={register}
-                onKeyDown={(e) => handleButtonKeyDown(e, register)}
-                disabled={!isVerificationFormValid || uiState.isSubmitting}
-                aria-busy={uiState.isSubmitting}
-                aria-live="polite"
-              >
-                {uiState.isSubmitting ? "Регистрация..." : "Зарегистрироваться"}
-              </button>
-
-              {uiState.canResendCode && (
+            {isFormValid && !uiState.isCodeSent && (
+              <>
+                <p className="auth-info">
+                  На Ваш номер телефона поступит звонок, введите последние 4
+                  цифры номера.
+                </p>
                 <button
                   className="auth-button"
                   onClick={sendVerificationCode}
                   onKeyDown={(e) =>
                     handleButtonKeyDown(e, sendVerificationCode)
                   }
-                  disabled={uiState.isSubmitting}
+                  disabled={!isFormValid || uiState.isSubmitting}
                   aria-busy={uiState.isSubmitting}
                   aria-live="polite"
                 >
-                  Отправить код еще раз
+                  {uiState.isSubmitting ? "Отправка..." : "Отправить код"}
                 </button>
-              )}
-            </>
-          )}
+              </>
+            )}
 
-          <div className="auth-links">
-            <p>
-              Уже есть учетная запись?
-              <Link to="/login" className="auth-link">
-                Войдите
-              </Link>
-            </p>
+            {uiState.isCodeSent && (
+              <>
+                <button
+                  className="auth-button"
+                  onClick={register}
+                  onKeyDown={(e) => handleButtonKeyDown(e, register)}
+                  disabled={!isVerificationFormValid || uiState.isSubmitting}
+                  aria-busy={uiState.isSubmitting}
+                  aria-live="polite"
+                >
+                  {uiState.isSubmitting
+                    ? "Регистрация..."
+                    : "Зарегистрироваться"}
+                </button>
+
+                {uiState.canResendCode && (
+                  <button
+                    className="auth-button"
+                    onClick={sendVerificationCode}
+                    onKeyDown={(e) =>
+                      handleButtonKeyDown(e, sendVerificationCode)
+                    }
+                    disabled={uiState.isSubmitting}
+                    aria-busy={uiState.isSubmitting}
+                    aria-live="polite"
+                  >
+                    Отправить код еще раз
+                  </button>
+                )}
+              </>
+            )}
+
+            <div className="auth-links">
+              <p>
+                Уже есть учетная запись?
+                <Link to="/login" className="auth-link">
+                  Войдите
+                </Link>
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
 
