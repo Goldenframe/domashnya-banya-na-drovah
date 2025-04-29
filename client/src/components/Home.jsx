@@ -12,6 +12,7 @@ import BookingTerms from "./HomePage/BookingTerms.jsx";
 import VirtualTour from "./HomePage/VirtualTour.jsx";
 import GuestHeader from "./GuestHeader.jsx";
 import Footer from "./Footer.jsx";
+import UserAccountHeader from "./UserComponents/UserAccountHeader.jsx";
 
 function Home() {
   const [userData, setUserData] = useState(null);
@@ -40,7 +41,7 @@ function Home() {
               {userData.role === "admin" ? (
                 <AdminAccountHeader userId={userData.userId} />
               ) : (
-                <UserAccount userId={userData.userId} />
+                <UserAccountHeader userId={userData.userId} />
               )}
             </div>
           </>
