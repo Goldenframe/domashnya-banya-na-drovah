@@ -1,1 +1,0 @@
-import{j as n,L as o}from"./index-CN-jU2vg.js";function i(){return n.jsxs("div",{children:["Похоже, такой страницы не существует!",n.jsx(o,{to:"/login",children:"Вернуться на гланую страницу"})]})}export{i as default};
