@@ -37,7 +37,7 @@ const Bookings = ({ userId, token }) => {
               }
               aria-current={({ isActive }) => (isActive ? "page" : null)}
             >
-              Актуальные бронирования
+              Предстоящие
             </NavLink>
           </li>
           <li>
@@ -48,7 +48,7 @@ const Bookings = ({ userId, token }) => {
               }
               aria-current={({ isActive }) => (isActive ? "page" : null)}
             >
-              Прошедшие бронирования
+              Прошедшие 
             </NavLink>
           </li>
         </ul>

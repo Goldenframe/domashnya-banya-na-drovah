@@ -281,8 +281,6 @@ function BookingForm({ userId, token }) {
             isDiscountApplicable(discount, start, end)
         );
 
-        console.log(`Проверяем скидку на ${service}:`, discount);
-
         const discountedPrice =
           discount?.service_prices?.[service] ?? servicePrices[service];
         cost += additionalServices[service].quantity * discountedPrice;
@@ -484,9 +482,6 @@ function BookingForm({ userId, token }) {
                 aria-labelledby="permanentDiscountsHeading"
                 className="discounts"
               >
-                <h2 id="permanentDiscountsHeading" className="visually-hidden">
-                  Постоянные акции
-                </h2>
                 <div className="discount permanent-discount" role="region">
                   {noTimeLimitDiscount.map((el, index) => (
                     <p key={index}>
@@ -502,9 +497,6 @@ function BookingForm({ userId, token }) {
                 aria-labelledby="temporaryDiscountsHeading"
                 className="discounts"
               >
-                <h2 id="temporaryDiscountsHeading" className="visually-hidden">
-                  Временные акции
-                </h2>
                 <div className="discount temporary-discount" role="region">
                   {timeLimitDiscount.map((el, index) => (
                     <p key={index}>

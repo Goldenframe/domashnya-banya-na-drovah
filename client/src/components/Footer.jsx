@@ -9,9 +9,6 @@ const Footer = () => {
       <div className="footer-container">
         <div className="footer-section">
           <h3 className="footer-title">ДомБан</h3>
-          <p className="footer-text">
-            Комфортные бани для вашего отдыха и релаксации
-          </p>
         </div>
 
         <div className="footer-section">
@@ -53,19 +50,9 @@ const Footer = () => {
                 info@domban.ru
               </a>
             </li>
-            <li className="footer-address">
-            г. Воронеж, ул. Егорова д. 10
-            </li>
+            <li className="footer-address">г. Воронеж, ул. Егорова д. 10</li>
           </ul>
         </div>
-
-        
-      </div>
-
-      <div className="footer-bottom">
-        <p className="copyright">
-          © {new Date().getFullYear()} ДомБан. Все права защищены
-        </p>
       </div>
     </footer>
   );

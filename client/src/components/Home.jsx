@@ -39,20 +39,35 @@ function Home() {
           <>
             <div>
               {userData.role === "admin" ? (
-                <AdminAccountHeader userId={userData.userId} />
+                <>
+                  <AdminAccountHeader userId={userData.userId} />
+                  <HeroSection />
+                  <GallerySlider />
+                  <BathRental />
+                  <VirtualTour />
+                </>
               ) : (
-                <UserAccountHeader userId={userData.userId} />
+                <>
+                  <UserAccountHeader userId={userData.userId} />
+                  <HeroSection />
+                  <GallerySlider />
+                  <BathRental />
+                  <VirtualTour />
+                </>
               )}
             </div>
           </>
         ) : (
-          <GuestHeader />
+          <>
+            <GuestHeader />
+
+            <HeroSection />
+            <GallerySlider />
+            <BathRental />
+            <BookingTerms />
+            <VirtualTour />
+          </>
         )}
-        <HeroSection />
-        <GallerySlider />
-        <BathRental />
-        <BookingTerms />
-        <VirtualTour />
       </main>
       <Footer />
     </>

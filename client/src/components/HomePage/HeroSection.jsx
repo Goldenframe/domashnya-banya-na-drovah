@@ -13,6 +13,8 @@ const HeroSection = () => {
     }
   };
 
+  
+
   return (
     <section className="hero">
       <div className="hero__container">
