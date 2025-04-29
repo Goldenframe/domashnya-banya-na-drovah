@@ -52,7 +52,7 @@
 @media (max-width: 800px) {
 
   .auth-background{
-    min-height: 115vh;
+    min-height: 120vh;
   }
 
   .auth-header{
