@@ -127,8 +127,8 @@ function Login() {
 
         navigate(
           decodedToken.role === "admin"
-            ? `/adminAccount/${response.data.userId}`
-            : `/userAccount/${response.data.userId}`
+            ? `/adminAccount/${response.data.userId}/intervals/new-interval`
+            : `/userAccount/${response.data.userId}/bookingForm`
         );
       }
     } catch (error) {

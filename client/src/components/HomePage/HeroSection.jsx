@@ -1,19 +1,43 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import imageIrl from "../../assets/img/1_4.webp";
 import "../../styles/herosection.css";
 import "../../styles/home.css";
+import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
+import { decodeToken } from "react-jwt";
 
 const HeroSection = () => {
+  const [userData, setUserData] = useState(null);
+  const navigate = useNavigate();
+
   const handleBookClick = () => {
-    const bookingSection = document.getElementById('booking-terms');
-    if (bookingSection) {
-      bookingSection.scrollIntoView({
-        behavior: 'smooth'
-      });
+    console.log(userData)
+    if (userData.role === 'user'){
+      navigate(`/userAccount/${userData.userId}/bookingForm`);    }
+    else{
+      const bookingSection = document.getElementById('booking-terms');
+      if (bookingSection) {
+        bookingSection.scrollIntoView({
+          behavior: 'smooth'
+        });
+      }
     }
   };
-
   
+    useEffect(() => {
+      const token = Cookies.get("token");
+  
+      if (token) {
+        const decoded = decodeToken(token);
+        if (decoded) {
+          setUserData({
+            userId: decoded.userId,
+            firstName: Cookies.get("firstName"),
+            role: decoded.role,
+          });
+        }
+      }
+    }, []);
 
   return (
     <section className="hero">
