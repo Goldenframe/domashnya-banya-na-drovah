@@ -191,12 +191,12 @@
   }
 }
 
-@media (max-width: 650px) {
+@media (max-width: 700px) {
   .calendar_container {
     justify-content: center;
     align-items: center;
-    max-width: 340px; /* Ограничиваем ширину */
-    margin: 0 auto; /* Выравниваем по центру */
+    max-width: 340px; 
+    margin: 0 auto; 
   }
 
   .calendar div {

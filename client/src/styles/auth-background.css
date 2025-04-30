@@ -6,8 +6,7 @@
     url("../assets/img/2_4.webp") no-repeat bottom center fixed;
   background-size: cover;
   min-height: 80vh;
-    -webkit-backdrop-filter: blur(7px);
-  backdrop-filter: blur(7px); 
+  backdrop-filter: blur(7px);
 }
 
 .auth-background .auth-block {
@@ -52,7 +51,7 @@
 @media (max-width: 800px) {
 
   .auth-background{
-    min-height: 120vh;
+    min-height: 115vh;
   }
 
   .auth-header{

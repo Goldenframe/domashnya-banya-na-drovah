@@ -189,7 +189,7 @@ export default function AddInterval() {
   };
 
   return (
-    <div className="account-form" onKeyDown={handleKeyDown}>
+    <div className="account-form interval" onKeyDown={handleKeyDown}>
       {(message || error) && (
         <div
           className={`auth-message ${error ? "error" : "success"} ${

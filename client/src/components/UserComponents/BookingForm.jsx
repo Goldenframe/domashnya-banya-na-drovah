@@ -449,7 +449,7 @@ function BookingForm({ userId, token }) {
 
   return (
     <section className="account-content">
-      <div className="account-form">
+      <div className="account-form book">
         {(message || error) && (
           <div
             className={`auth-message ${error ? "error" : "success"} ${
@@ -575,7 +575,7 @@ function BookingForm({ userId, token }) {
           <div className="price-container" role="region" aria-live="polite">
             <div className="price-content">
               <p className="price">
-                <strong>Итоговая стоимость:</strong>
+                Итоговая стоимость:
                 <span aria-label={`${price} рублей`}>{price} ₽</span>
               </p>
               <button

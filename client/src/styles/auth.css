@@ -270,7 +270,6 @@
   }
 }
 
-/* Большие планшеты и маленькие ноутбуки (1025px - 1254px) */
 @media (min-width: 1024px) and (max-width: 1264px) {
   .auth-block {
     padding: 50px 40px;
@@ -289,12 +288,8 @@
   }
 }
 
-/* Мобильные устройства (до 767px) */
 @media (max-width: 780px) {
-  /* .auth-container {
-    padding: 15px;
-    align-items: flex-start;
-  } */
+
 
   .auth-block {
     padding: 30px 20px;
@@ -313,6 +308,10 @@
   }
 
   .log .auth-form{
+    padding:  10px 50px;
+  }
+
+  .forget .auth-form{
     padding:  10px 50px;
   }
 
@@ -364,6 +363,8 @@
     max-width: 95%;
   }
 
+
+  
   .edit input, .reg input{
     width: 160px;
   }
@@ -399,9 +400,14 @@
     }
 
 
-  .edit{
+  .edit, .forget{
     width: 80%;
     padding: 40px 0;
+  }
+
+  
+  .reg{
+    width: 70%;
   }
 
   .auth-column{
@@ -456,7 +462,7 @@
     font-size: 15px;
   }
 
-  .edit, .log{
+  .edit, .log, .reg, .forget{
     width: 90%;
     padding: 40px 0;
   }

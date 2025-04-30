@@ -326,6 +326,13 @@
   }
 }
 
+@media (max-width: 940px) {
+  .account-form {
+    width: 95%;
+    padding: 30px 70px;
+  }
+}
+
 @media (max-width: 880px) {
   .account-content {
     width: 95%;
@@ -349,8 +356,14 @@
   }
 }
 
+@media (max-width: 830px) {
+  .account-form {
+    padding: 30px 70px;
+  }
+}
+
 @media (max-width: 800px) {
-  .home-links{
+  .home-links {
     position: fixed;
     top: 0;
     z-index: 100;
@@ -444,12 +457,13 @@
   }
   .account-form {
     width: 90%;
-    padding: 35px 50px;
+    padding: 25px 50px;
     border-top-left-radius: 50px;
     border-bottom-right-radius: 50px;
+  }
+  .account-form.book {
     margin-top: 90px;
   }
-
   .account-action-buttons {
     flex-direction: column;
     gap: 10px;
@@ -474,9 +488,19 @@
     font-size: 16px;
   }
 }
+
+@media (max-width: 740px) {
+  .account-form {
+    padding: 20px 30px;
+  }
+}
+
 @media (max-width: 700px) {
   .account-form {
     padding: 35px;
+  }
+  .account-content .account-form {
+    width: 90%;
   }
 }
 @media (max-width: 650px) {
@@ -498,7 +522,10 @@
     padding: 25px 40px;
     border-top-left-radius: 30px;
     border-bottom-right-radius: 30px;
-    margin: 90px 0 0 0;
+  }
+
+  .account-form .interval {
+    margin: 0;
   }
 
   .empty-list {

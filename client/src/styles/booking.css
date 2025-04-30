@@ -39,22 +39,6 @@
   font-size: 16px;
 }
 
-/* @media (min-width: 1025px) {
-  .booking-wrapper {
-    gap: 40px;
-  }
-  
-  .price {
-    font-size: 22px;
-  }
-  
-  .discounts {
-    font-size: 16px;
-    padding: 20px 25px;
-  }
-}
- */
-
 @media (max-width: 1264px) {
   .booking-wrapper {
     flex-direction: row;
@@ -139,7 +123,7 @@
     font-size: 18px;
   }
 
-  .booking-wrapper .time-controls{
+  .booking-wrapper .time-controls {
     margin-left: 0;
   }
 }
@@ -156,31 +140,28 @@
     margin-top: 15px;
   }
 
-  .price{
+  .price {
     font-size: 17px;
   }
-
 }
 
 @media (max-width: 780px) {
   .booking-wrapper {
     gap: 30px;
-    margin: 0;
+    margin: 20px 0;
   }
 
   .price-container {
     margin-top: 0;
   }
 
-
   .discounts {
     text-align: left;
     padding: 15px 20px;
   }
-
 }
 
-@media (max-width: 650px) {
+@media (max-width: 700px) {
   .booking-wrapper {
     flex-direction: row;
     justify-content: center;
@@ -219,7 +200,7 @@
     flex: 2;
   }
 
-  .price{
+  .price {
     font-size: 18px;
     margin: 10px 0;
   }

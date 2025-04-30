@@ -24,14 +24,14 @@ fieldset.date-selection-method {
   border: 0;
   padding: 0;
   margin: 0;
-  min-width: 0; /* Важно для правильного отображения в Firefox */
+  min-width: 0; 
   width: 490px;
   text-align: center;
   margin: 10px 0 30px 0;
 }
 
 fieldset.date-selection-method legend {
-  display: contents; /* Позволяет legend участвовать в потоке без бокса */
+  display: contents;
   width: 100%;
   text-align: center;
   font-size: inherit;
@@ -360,7 +360,6 @@ textarea::-webkit-scrollbar {
   }
 
   .time-controls {
-    /* align-items: center; */
     justify-content: center;
     padding: 0;
   }
@@ -475,11 +474,11 @@ textarea::-webkit-scrollbar {
   }
 }
 
-@media (max-width: 650px) {
+@media (max-width: 700px) {
   fieldset.date-selection-method {
     width: 100%;
     max-width: 340px;
-    margin: 15px auto;
+    margin: 5px auto 25px auto;
   }
 
   .time-select__control {
@@ -537,7 +536,7 @@ textarea::-webkit-scrollbar {
   fieldset.date-selection-method {
     width: 100%;
     max-width: 320px;
-    margin: 15px auto;
+    margin: 5px auto 20px auto;
   }
 
   .time-select__control {
