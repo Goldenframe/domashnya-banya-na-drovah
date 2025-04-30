@@ -11,7 +11,7 @@ const AdminDiscountsManager = ({ userId, token }) => {
 
     const handleEditDiscount = (discount) => {
         setCurrentDiscount(discount);
-        navigate(`https://api.dom-ban-na-drovah.ru/api/adminAccount/${userId}/discountsManager/new-discount`, { 
+        navigate(`/adminAccount/${userId}/discountsManager/new-discount`, { 
             state: { discount }, 
             replace: true 
         });

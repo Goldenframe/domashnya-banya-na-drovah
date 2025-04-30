@@ -100,12 +100,9 @@ const EditProfile = ({ userId, token, updateUserData }) => {
         return;
       }
 
-      const response = await axios.delete(
-        `https://api.dom-ban-na-drovah.ru/api/userAccount/${userId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await axios.delete(`https://api.dom-ban-na-drovah.ru/api/userAccount/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       showMessage(response.data.message);
 
       Cookies.remove("token");
@@ -152,13 +149,10 @@ const EditProfile = ({ userId, token, updateUserData }) => {
   };
 
   const formatPhoneNumber = (value) => {
-    // Удаляем все нецифровые символы
     const cleaned = value.replace(/\D/g, "");
 
-    // Ограничиваем длину номера 11 цифрами (для российских номеров)
     const limited = cleaned.slice(0, 11);
 
-    // Форматируем номер в зависимости от длины
     let formatted = limited;
     if (limited.length > 0) {
       formatted = `+7 (`;
@@ -182,13 +176,11 @@ const EditProfile = ({ userId, token, updateUserData }) => {
     const input = e.target.value;
     const previousValue = phoneNumber;
 
-    // Если пользователь удаляет символы (backspace или delete)
     if (input.length < previousValue.length) {
       setPhoneNumber(input);
       return;
     }
 
-    // Применяем форматирование
     const formatted = formatPhoneNumber(input);
     setPhoneNumber(formatted);
   };
@@ -256,7 +248,7 @@ const EditProfile = ({ userId, token, updateUserData }) => {
       hasError = true;
     }
 
-    if (isPhoneChanged && !isPhoneValid) {
+    if (isPhoneChanged && !isPhoneValid()) {
       showError("Номер телефона некорректен.");
       setInputError((prev) => ({ ...prev, phone: true }));
       hasError = true;
@@ -300,7 +292,7 @@ const EditProfile = ({ userId, token, updateUserData }) => {
       return;
     }
 
-    if (isPhoneChanged && !isPhoneValid) {
+    if (isPhoneChanged && !isPhoneValid()) {
       setInputError((prevState) => ({ ...prevState, phone: true }));
       showError("Введите корректный номер телефона.");
       setTimeout(
@@ -310,7 +302,7 @@ const EditProfile = ({ userId, token, updateUserData }) => {
       return;
     }
 
-    if (isPhoneChanged && isPhoneValid) {
+    if (isPhoneChanged && isPhoneValid()) {
       if (isCodeSent) {
         await handlePhoneChangeVerify();
       } else {
@@ -393,23 +385,6 @@ const EditProfile = ({ userId, token, updateUserData }) => {
     }
   };
 
-  useEffect(() => {
-    setHasChanged(
-      firstName !== initialData.first_name ||
-        lastName !== initialData.last_name ||
-        phoneNumber !== initialData.phone_number ||
-        newPassword !== "" ||
-        confirmPassword !== ""
-    );
-  }, [
-    firstName,
-    lastName,
-    phoneNumber,
-    newPassword,
-    confirmPassword,
-    initialData,
-  ]);
-
   const handleCancelChanges = async () => {
     try {
       const response = await axios.get(
@@ -421,7 +396,7 @@ const EditProfile = ({ userId, token, updateUserData }) => {
       setInitialData(response.data);
       setFirstName(response.data.first_name);
       setLastName(response.data.last_name);
-      setPhoneNumber(response.data.phone_number);
+      setPhoneNumber(formatPhoneNumber(response.data.phone_number));
       setNewPassword("");
       setConfirmPassword("");
       setHasChanged(false);
@@ -440,26 +415,12 @@ const EditProfile = ({ userId, token, updateUserData }) => {
   const isPasswordsMatch = newPassword === confirmPassword;
   const isButtonDisabled =
     !hasChanged ||
-    !isPhoneValid() ||
+    (isPhoneChanged && !isPhoneValid()) ||
     (newPassword && !isPasswordsMatch) ||
-    (firstName === initialData.first_name &&
-      lastName === initialData.last_name &&
-      phoneNumber === initialData.phone_number) ||
     inputError.phone;
 
-  useEffect(() => {
-    setIsPhoneChanged(
-      phoneNumber !== initialData.phone_number && phoneNumber.trim() !== ""
-    );
-    setHasChanged(
-      phoneNumber !== initialData.phone_number &&
-        phoneNumber.trim() !== "" &&
-        isPhoneValid
-    );
-  }, [phoneNumber, initialData.phone_number, isPhoneValid]);
-
   const getButtonText = () => {
-    if (isPhoneChanged && isPhoneValid) {
+    if (isPhoneChanged && isPhoneValid()) {
       return isCodeSent ? "Подтвердить" : "Отправить код";
     }
     return hasChanged ? "Сохранить" : "Сохранить";
@@ -487,7 +448,7 @@ const EditProfile = ({ userId, token, updateUserData }) => {
               {message || error}
             </div>
           )}
-          {isPhoneChanged && isPhoneValid && (
+          {isPhoneChanged && isPhoneValid() && (
             <p className="auth-info" aria-live="polite">
               Вам поступит звонок. Для смены телефона введите последние 4 цифры
               звонившего номера.
@@ -499,7 +460,11 @@ const EditProfile = ({ userId, token, updateUserData }) => {
               пароль.
             </p>
           )}
-          <form className="auth-form" onSubmit={handleSubmit}>
+          <form
+            className="auth-form"
+            onSubmit={handleSubmit}
+            autoComplete="off"
+          >
             <div className="auth-row">
               <div className="auth-column">
                 <label
@@ -584,7 +549,7 @@ const EditProfile = ({ userId, token, updateUserData }) => {
                     aria-describedby={
                       inputError.phone ? "phone-error" : undefined
                     }
-                    autoComplete="off" // Добавлено
+                    autoComplete="off"
                   />
                   {inputError.phone && (
                     <span id="phone-error" className="visually-hidden">
@@ -626,7 +591,7 @@ const EditProfile = ({ userId, token, updateUserData }) => {
                       }`}
                       value={currentPassword}
                       onChange={handleInputChange(setCurrentPassword)}
-                      autoComplete="current-password" // Оставляем как есть для паролей
+                      autoComplete="current-password"
                       maxLength={16}
                       aria-required={!!newPassword}
                       aria-invalid={!!inputError.currentPassword}
