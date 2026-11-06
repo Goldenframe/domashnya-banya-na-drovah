@@ -1,3 +1,8 @@
+import { cleanPhoneNumber, phoneSchema, verificationCodeSchema } from "@/shared/lib/phone.js";
+import { requestCodeSchema, verifyCodeSchema, resetPasswordSchema } from "../model/recovery-schema.js";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useFormField } from "@/shared/lib/use-form-field.js";
 import { useState, useEffect, useRef } from "react";
 import { api } from "@/shared/api";
 import { useNavigate, Link } from "react-router-dom";
@@ -12,15 +17,26 @@ import "@/shared/ui/styles/auth.css";
 import "@/shared/ui/styles/auth-background.css";
 
 function ForgotPassword() {
-  const [phone, setPhone] = useState("");
-  const [code, setCode] = useState("");
   const [isCodeSent, setIsCodeSent] = useState(false);
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [isCodeVerified, setIsCodeVerified] = useState(false);
   const [resendTimeout, setResendTimeout] = useState(null);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
+  const schema = isCodeVerified ? resetPasswordSchema
+    : isCodeSent ? verifyCodeSchema : requestCodeSchema;
+  const form = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      phone: "",
+      code: "",
+      newPassword: "",
+      confirmPassword: "",
+    },
+  });
+  const [phone, setPhone] = useFormField(form, "phone");
+  const [code, setCode] = useFormField(form, "code");
+  const [newPassword, setNewPassword] = useFormField(form, "newPassword");
+  const [confirmPassword, setConfirmPassword] = useFormField(form, "confirmPassword");
   const { message, showMessage, error, showError, isVisible } =
     useShowMessage();
   const navigate = useNavigate();
@@ -37,29 +53,12 @@ function ForgotPassword() {
   }, []);
 
   useEffect(() => {
-    if (isCodeSent && codeInputRef.current) {
+    if (!isCodeVerified && isCodeSent && codeInputRef.current) {
       codeInputRef.current.focus();
     } else if (isCodeVerified && newPasswordInputRef.current) {
       newPasswordInputRef.current.focus();
     }
   }, [isCodeSent, isCodeVerified]);
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === "Enter") {
-        if (!isCodeVerified && !isCodeSent && isPhoneValid) {
-          sendCode();
-        } else if (!isCodeVerified && isCodeSent && code) {
-          verifyCode();
-        } else if (isCodeVerified && newPassword && confirmPassword) {
-          resetPassword();
-        }
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  });
 
   const formatPhoneNumber = (value) => {
     const cleaned = value.replace(/\D/g, "");
@@ -94,19 +93,16 @@ function ForgotPassword() {
     setPhone(formatted);
   };
 
-  const getCleanPhoneNumber = () => {
-    const cleanPhone = phone.replace(/\D/g, "");
-    return cleanPhone.length === 10 ? "7" + cleanPhone : cleanPhone;
-  };
+  const isPhoneValid = phoneSchema.safeParse(phone).success;
+  const isCodeValid = verificationCodeSchema.safeParse(code).success;
+  const { isSubmitting } = form.formState;
 
-  const isPhoneValid = getCleanPhoneNumber().length === 11;
-
-  const sendCode = async () => {
+  const sendCode = async ({ phone }) => {
     try {
       const response = await api.post(
         `/api/forgot-password`,
         {
-          phone_number: getCleanPhoneNumber(),
+          phone_number: cleanPhoneNumber(phone),
         }
       );
       showMessage(response.data.message);
@@ -121,15 +117,15 @@ function ForgotPassword() {
   };
 
   const resendCode = () => {
-    sendCode();
+    if (isPhoneValid) return sendCode({ phone });
   };
 
-  const verifyCode = async () => {
+  const verifyCode = async ({ phone, code }) => {
     try {
       const response = await api.post(
         `/api/verify-code`,
         {
-          phone_number: getCleanPhoneNumber(),
+          phone_number: cleanPhoneNumber(phone),
           verification_code: code,
         }
       );
@@ -145,20 +141,12 @@ function ForgotPassword() {
     }
   };
 
-  const resetPassword = async () => {
-    if (newPassword !== confirmPassword) {
-      showError("Пароли не совпадают!");
-      if (newPasswordInputRef.current) {
-        newPasswordInputRef.current.focus();
-      }
-      return;
-    }
-
+  const resetPassword = async ({ phone, code, newPassword }) => {
     try {
       const response = await api.post(
         `/api/reset-password`,
         {
-          phone_number: getCleanPhoneNumber(),
+          phone_number: cleanPhoneNumber(phone),
           verification_code: code,
           new_password: newPassword,
         }
@@ -175,6 +163,11 @@ function ForgotPassword() {
       }
     }
   };
+
+  const submitRecovery = form.handleSubmit(
+    isCodeVerified ? resetPassword : isCodeSent ? verifyCode : sendCode,
+    (errors) => showError(Object.values(errors)[0].message)
+  );
 
   return (
     <div className="auth-page auth-background">
@@ -213,7 +206,7 @@ function ForgotPassword() {
                 {message || error}
               </div>
             )}
-            <form className="auth-form" onSubmit={(e) => e.preventDefault()}>
+            <form className="auth-form" noValidate onSubmit={submitRecovery}>
               {!isCodeVerified ? (
                 !isCodeSent ? (
                   <>
@@ -247,9 +240,9 @@ function ForgotPassword() {
                     </p>
                     <button
                       className="auth-button"
-                      onClick={sendCode}
-                      disabled={!isPhoneValid}
-                      aria-disabled={!isPhoneValid}
+                      type="submit"
+                      disabled={!isPhoneValid || isSubmitting}
+                      aria-disabled={!isPhoneValid || isSubmitting}
                     >
                       {!isPhoneValid
                         ? "Введите номер телефона"
@@ -268,15 +261,15 @@ function ForgotPassword() {
                         onChange={(e) => setCode(e.target.value)}
                         maxLength={4}
                         aria-required="true"
-                        aria-invalid={code.length > 0 && code.length < 4}
+                        aria-invalid={code.length > 0 && !isCodeValid}
                         aria-describedby={
-                          code.length > 0 && code.length < 4
+                          code.length > 0 && !isCodeValid
                             ? "codeError"
                             : undefined
                         }
                         ref={codeInputRef}
                       />
-                      {code.length > 0 && code.length < 4 && (
+                      {code.length > 0 && !isCodeValid && (
                         <span id="codeError" className="auth-error-message">
                           Код должен содержать 4 цифры
                         </span>
@@ -284,18 +277,20 @@ function ForgotPassword() {
                     </label>
                     <button
                       className="auth-button"
-                      onClick={verifyCode}
-                      disabled={code.length !== 4}
-                      aria-disabled={code.length !== 4}
+                      type="submit"
+                      disabled={!isCodeValid || isSubmitting}
+                      aria-disabled={!isCodeValid || isSubmitting}
                     >
-                      {code.length !== 4
+                      {!isCodeValid
                         ? "Введите 4 цифры кода"
                         : "Подтвердить код"}
                     </button>
                     {resendTimeout === null && (
                       <button
                         className="auth-button secondary"
+                        type="button"
                         onClick={resendCode}
+                        disabled={isSubmitting}
                       >
                         Отправить код снова
                       </button>
@@ -412,9 +407,9 @@ function ForgotPassword() {
                   </label>
                   <button
                     className="auth-button"
-                    onClick={resetPassword}
+                    type="submit"
                     disabled={
-                      !(
+                      isSubmitting || !(
                         newPassword &&
                         confirmPassword &&
                         newPassword === confirmPassword &&
@@ -422,7 +417,7 @@ function ForgotPassword() {
                       )
                     }
                     aria-disabled={
-                      !(
+                      isSubmitting || !(
                         newPassword &&
                         confirmPassword &&
                         newPassword === confirmPassword &&

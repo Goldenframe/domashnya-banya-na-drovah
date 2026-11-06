@@ -1,3 +1,7 @@
+import { discountSchema } from "../../model/discount-schema.js";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useFormField } from "@/shared/lib/use-form-field.js";
 import React, { useState, useEffect, useMemo } from "react";
 import { api } from "@/shared/api";
 import { useLocation, useOutletContext } from "react-router-dom";
@@ -22,54 +26,49 @@ export default function DiscountForm() {
   const discountData = useMemo(() => {
     return location.state?.discount || {};
   }, [location.state]);
-  const [description, setDescription] = useState(
-    discountData.description || ""
-  );
-  const [discountType, setDiscountType] = useState(
-    discountData.discount_type || "discount"
-  );
-  const [applicableServices, setApplicableServices] = useState(
-    discountData.applicable_services || []
-  );
-  const [servicePrices, setServicePrices] = useState(
-    discountData.service_prices || {
-      broom: 150,
-      towel: 200,
-      hat: 50,
-      sheets: 200,
-    }
-  );
-  const [freeServiceCounts, setFreeServiceCounts] = useState(
-    discountData.free_service_counts || {
-      broom: 0,
-      towel: 0,
-      hat: 0,
-      sheets: 0,
-    }
-  );
-  const [minServiceCounts, setMinServiceCounts] = useState(
-    discountData.min_service_counts || { broom: 0, towel: 0, hat: 0, sheets: 0 }
-  );
-  const [additionalServices, setAdditionalServices] = useState(
-    discountData.additional_services || {
-      broom: { selected: false, quantity: 0 },
-      towel: { selected: false, quantity: 0 },
-      hat: { selected: false, quantity: 0 },
-      sheets: { selected: false, quantity: 0 },
-    }
-  );
-  const [selectedDates, setSelectedDates] = useState(
-    discountData.applicable_days || []
-  );
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [startTime, setStartTime] = useState(discountData.valid_from || "");
-  const [endTime, setEndTime] = useState(discountData.valid_till || "");
-  const [discountPercentage, setDiscountPercentage] = useState(
-    discountData.discount_percentage || 0
-  );
-  const [timeDiscountType, setTimeDiscountType] = useState(
-    discountData.time_discount_type || "no_time_limit"
-  );
+  const form = useForm({
+    resolver: zodResolver(discountSchema),
+    defaultValues: {
+      description: discountData.description || "",
+      discountType: discountData.discount_type || "discount",
+      servicePrices: discountData.service_prices || {
+        broom: 150,
+        towel: 200,
+        hat: 50,
+        sheets: 200,
+        },
+      freeServiceCounts: discountData.free_service_counts || {
+        broom: 0,
+        towel: 0,
+        hat: 0,
+        sheets: 0,
+        },
+      minServiceCounts: discountData.min_service_counts || { broom: 0, towel: 0, hat: 0, sheets: 0 },
+      additionalServices: discountData.additional_services || {
+        broom: { selected: false, quantity: 0 },
+        towel: { selected: false, quantity: 0 },
+        hat: { selected: false, quantity: 0 },
+        sheets: { selected: false, quantity: 0 },
+        },
+      selectedDates: discountData.applicable_days || [],
+      startTime: discountData.valid_from || "",
+      endTime: discountData.valid_till || "",
+      discountPercentage: discountData.discount_percentage || 0,
+      timeDiscountType: discountData.time_discount_type || "no_time_limit",
+    },
+  });
+  const [description, setDescription] = useFormField(form, "description");
+  const [discountType, setDiscountType] = useFormField(form, "discountType");
+  const [servicePrices, setServicePrices] = useFormField(form, "servicePrices");
+  const [freeServiceCounts, setFreeServiceCounts] = useFormField(form, "freeServiceCounts");
+  const [minServiceCounts, setMinServiceCounts] = useFormField(form, "minServiceCounts");
+  const [additionalServices, setAdditionalServices] = useFormField(form, "additionalServices");
+  const [selectedDates, setSelectedDates] = useFormField(form, "selectedDates");
+  const [startTime, setStartTime] = useFormField(form, "startTime");
+  const [endTime, setEndTime] = useFormField(form, "endTime");
+  const [discountPercentage, setDiscountPercentage] = useFormField(form, "discountPercentage");
+  const [timeDiscountType, setTimeDiscountType] = useFormField(form, "timeDiscountType");
   const timeStartOptions = Array.from({ length: 15 }, (_, i) => {
     const hour = (8 + i).toString().padStart(2, "0") + ":00";
     return { value: hour, label: hour };
@@ -213,8 +212,10 @@ export default function DiscountForm() {
     }
   };
 
-  const handleAddDiscount = async (e) => {
-    e.preventDefault();
+  const handleAddDiscount = async ({
+    description, discountType, timeDiscountType, startTime, endTime, selectedDates,
+    discountPercentage, additionalServices, servicePrices, freeServiceCounts, minServiceCounts,
+  }) => {
     const newDiscount = {
       description,
       discountType,
@@ -256,7 +257,6 @@ export default function DiscountForm() {
     setStartTime("");
     setEndTime("");
     setDiscountPercentage(0);
-    setApplicableServices([]);
     setServicePrices({ broom: 150, towel: 200, hat: 50, sheets: 200 });
     setFreeServiceCounts({ broom: 0, towel: 0, hat: 0, sheets: 0 });
     setMinServiceCounts({ broom: 0, towel: 0, hat: 0, sheets: 0 });
@@ -327,19 +327,6 @@ export default function DiscountForm() {
   for (let i = 0; i < emptyCellsAfterLastDay; i++) {
     calendarCells.push(<div key={`empty-after-${i}`} />);
   }
-  const isFormValid =
-    description &&
-    discountType &&
-    startTime &&
-    endTime &&
-    ((discountType === "discount" ? discountPercentage : true) ||
-      ((discountType === "discount_service"
-        ? Object.values(servicePrices).some((price) => price > 0)
-        : true) &&
-        (discountType === "free"
-          ? Object.values(freeServiceCounts).some((count) => count > 0)
-          : true)));
-
   const isFormEmpty =
     !description &&
     !startTime &&
@@ -369,7 +356,9 @@ export default function DiscountForm() {
           {message || error}
         </p>
       )}
-      <form onSubmit={handleAddDiscount}>
+      <form noValidate onSubmit={form.handleSubmit(handleAddDiscount, (errors) => {
+        showError(Object.values(errors)[0]?.message || "Проверьте данные акции.");
+      })}>
         <div>
           <label className="form-label">Описание акции:</label>
           <textarea
@@ -624,7 +613,7 @@ export default function DiscountForm() {
           </div>
         </div>
         <div>
-          <button type="submit" disabled={!isFormValid} className="form-button">
+          <button type="submit" disabled={!description || !startTime || !endTime || form.formState.isSubmitting} className="form-button">
             {discountData.id ? "Сохранить изменения" : "Добавить акцию"}
           </button>
         </div>

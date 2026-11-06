@@ -1,3 +1,7 @@
+import { editProfileSchema, requestPhoneChangeSchema, verifyPhoneChangeSchema } from "../model/edit-profile-schema.js";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useFormField } from "@/shared/lib/use-form-field.js";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "@/shared/api";
@@ -12,21 +16,36 @@ import "./password.css";
 import "@/shared/ui/styles/account.css";
 
 const EditProfile = ({ userId, token, updateUserData }) => {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
   const [isPhoneChanged, setIsPhoneChanged] = useState(false);
   const [initialData, setInitialData] = useState({});
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [hasChanged, setHasChanged] = useState(false);
   const [isCodeSent, setIsCodeSent] = useState(false);
-  const [verificationCode, setVerificationCode] = useState("");
+  const schema = isPhoneChanged
+    ? (isCodeSent ? verifyPhoneChangeSchema : requestPhoneChangeSchema)
+    : editProfileSchema;
+  const form = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      phoneNumber: "",
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+      verificationCode: "",
+    },
+  });
+  const [firstName, setFirstName] = useFormField(form, "firstName");
+  const [lastName, setLastName] = useFormField(form, "lastName");
+  const [phoneNumber, setPhoneNumber] = useFormField(form, "phoneNumber");
+  const [currentPassword, setCurrentPassword] = useFormField(form, "currentPassword");
+  const [newPassword, setNewPassword] = useFormField(form, "newPassword");
+  const [confirmPassword, setConfirmPassword] = useFormField(form, "confirmPassword");
+  const [verificationCode, setVerificationCode] = useFormField(form, "verificationCode");
   const [inputError, setInputError] = useState({
     firstName: false,
     lastName: false,
@@ -36,7 +55,7 @@ const EditProfile = ({ userId, token, updateUserData }) => {
     confirmPassword: false,
   });
   const [isProfileUpdated, setIsProfileUpdated] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { isSubmitting } = form.formState;
   const { message, showMessage, error, showError, isVisible } =
     useShowMessage();
   const navigate = useNavigate();
@@ -234,84 +253,13 @@ const EditProfile = ({ userId, token, updateUserData }) => {
       console.error("Ошибка при подтверждении номера:", error);
     }
   };
-  const validateForm = () => {
-    let hasError = false;
-    if (newPassword && !currentPassword) {
-      showError("Пожалуйста, введите текущий пароль.");
-      setInputError((prev) => ({ ...prev, currentPassword: true }));
-      hasError = true;
-    }
-
-    if (newPassword && newPassword !== confirmPassword) {
-      showError("Пароли не совпадают.");
-      setInputError((prev) => ({ ...prev, confirmPassword: true }));
-      hasError = true;
-    }
-
-    if (isPhoneChanged && !isPhoneValid()) {
-      showError("Номер телефона некорректен.");
-      setInputError((prev) => ({ ...prev, phone: true }));
-      hasError = true;
-    }
-
-    return !hasError;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setInputError({
-      firstName: false,
-      lastName: false,
-      phone: false,
-      currentPassword: false,
-      newPassword: false,
-      confirmPassword: false,
-    });
-
-    const nameRegex = /^[А-Яа-яЁё]+$/;
-
-    if (!nameRegex.test(firstName)) {
-      setInputError((prevState) => ({ ...prevState, firstName: true }));
-      showError("Имя должно содержать только русские буквы.");
-      setTimeout(
-        () =>
-          setInputError((prevState) => ({ ...prevState, firstName: false })),
-        7000
-      );
+  const submitProfile = async () => {
+    setInputError({});
+    if (isPhoneChanged) {
+      if (isCodeSent) await handlePhoneChangeVerify();
+      else await handlePhoneChangeRequest();
       return;
     }
-
-    if (!nameRegex.test(lastName)) {
-      setInputError((prevState) => ({ ...prevState, lastName: true }));
-      showError("Фамилия должна содержать только русские буквы.");
-      setTimeout(
-        () => setInputError((prevState) => ({ ...prevState, lastName: false })),
-        7000
-      );
-      return;
-    }
-
-    if (isPhoneChanged && !isPhoneValid()) {
-      setInputError((prevState) => ({ ...prevState, phone: true }));
-      showError("Введите корректный номер телефона.");
-      setTimeout(
-        () => setInputError((prevState) => ({ ...prevState, phone: false })),
-        7000
-      );
-      return;
-    }
-
-    if (isPhoneChanged && isPhoneValid()) {
-      if (isCodeSent) {
-        await handlePhoneChangeVerify();
-      } else {
-        await handlePhoneChangeRequest();
-      }
-      return;
-    }
-
-    if (!validateForm()) return;
 
     try {
       const cleanPhone = getCleanPhoneNumber();
@@ -380,10 +328,16 @@ const EditProfile = ({ userId, token, updateUserData }) => {
           error.response?.data?.message || "Ошибка при обновлении данных."
         );
       }
-    } finally {
-      setIsSubmitting(false);
     }
   };
+
+  const handleSubmit = form.handleSubmit(submitProfile, (errors) => {
+    const messages = Object.fromEntries(Object.entries(errors).map(([name, value]) => [
+      name === "phoneNumber" ? "phone" : name, value.message,
+    ]));
+    setInputError(messages);
+    showError(Object.values(messages)[0]);
+  });
 
   const handleCancelChanges = async () => {
     try {
@@ -417,7 +371,7 @@ const EditProfile = ({ userId, token, updateUserData }) => {
     !hasChanged ||
     (isPhoneChanged && !isPhoneValid()) ||
     (newPassword && !isPasswordsMatch) ||
-    inputError.phone;
+    isSubmitting;
 
   const getButtonText = () => {
     if (isPhoneChanged && isPhoneValid()) {
@@ -463,6 +417,7 @@ const EditProfile = ({ userId, token, updateUserData }) => {
           <form
             className="auth-form"
             onSubmit={handleSubmit}
+            noValidate
             autoComplete="off"
           >
             <div className="auth-row">

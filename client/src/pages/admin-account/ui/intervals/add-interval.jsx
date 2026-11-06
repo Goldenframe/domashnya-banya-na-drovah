@@ -1,3 +1,7 @@
+import { intervalSchema } from "../../model/interval-schema.js";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useFormField } from "@/shared/lib/use-form-field.js";
 import React, { useState, useEffect } from "react";
 import { api } from "@/shared/api";
 import CalendarAdmin from "./calendar-admin.jsx";
@@ -19,12 +23,23 @@ export default function AddInterval() {
     setSelectedDates,
   } = useOutletContext();
 
-  const [bookingDateStart, setBookingDateStart] = useState("");
-  const [bookingDateEnd, setBookingDateEnd] = useState("");
   const [availableIntervals, setAvailableIntervals] = useState([]);
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
-  const [dateSelectionMethod, setDateSelectionMethod] = useState("individual");
+  const form = useForm({
+    resolver: zodResolver(intervalSchema),
+    defaultValues: {
+      bookingDateStart: "",
+      bookingDateEnd: "",
+      startTime: "",
+      endTime: "",
+      dateSelectionMethod: "individual",
+      selectedDates: [],
+    },
+  });
+  const [bookingDateStart, setBookingDateStart] = useFormField(form, "bookingDateStart");
+  const [bookingDateEnd, setBookingDateEnd] = useFormField(form, "bookingDateEnd");
+  const [startTime, setStartTime] = useFormField(form, "startTime");
+  const [endTime, setEndTime] = useFormField(form, "endTime");
+  const [dateSelectionMethod, setDateSelectionMethod] = useFormField(form, "dateSelectionMethod");
   const { message, showMessage, error, showError, isVisible } =
     useShowMessage();
   const apiUrl = import.meta.env.VITE_API_URL;
@@ -67,40 +82,18 @@ export default function AddInterval() {
     }
   }, [bookingDateStart, userId]);
 
-  const addInterval = async () => {
-    try {
-      if (
-        (!bookingDateStart && dateSelectionMethod === "range") ||
-        (!selectedDates.length && dateSelectionMethod === "individual") ||
-        !startTime ||
-        !endTime
-      ) {
-        showError(
-          "Пожалуйста, выберите хотя бы одну дату и заполните все поля интервала."
-        );
-        throw new Error(
-          "Пожалуйста, выберите хотя бы одну дату и заполните все поля интервала."
-        );
-      }
+  useEffect(() => {
+    form.setValue("selectedDates", selectedDates);
+  }, [form.setValue, selectedDates]);
 
+  const addInterval = async ({ dateSelectionMethod, bookingDateStart, bookingDateEnd, startTime, endTime, selectedDates }) => {
+    try {
       const intervalsToAdd = [];
       if (dateSelectionMethod === "range") {
         const startDate = new Date(bookingDateStart);
         const endDate = new Date(bookingDateEnd);
         for (let d = startDate; d <= endDate; d.setDate(d.getDate() + 1)) {
           const currentDate = new Date(d);
-          const startDateTime = new Date(
-            `${currentDate.toISOString().split("T")[0]}T${startTime}`
-          );
-          const endDateTime = new Date(
-            `${currentDate.toISOString().split("T")[0]}T${endTime}`
-          );
-          if (endDateTime <= startDateTime) {
-            showError("Время окончания должно быть после времени начала.");
-            throw new Error(
-              "Время окончания должно быть после времени начала."
-            );
-          }
           intervalsToAdd.push({
             booking_date: currentDate.toISOString().split("T")[0],
             start_time: startTime,
@@ -110,18 +103,6 @@ export default function AddInterval() {
       } else {
         selectedDates.forEach((formattedCurrentDate) => {
           const currentDate = new Date(formattedCurrentDate);
-          const startDateTime = new Date(
-            `${currentDate.toISOString().split("T")[0]}T${startTime}`
-          );
-          const endDateTime = new Date(
-            `${currentDate.toISOString().split("T")[0]}T${endTime}`
-          );
-          if (endDateTime <= startDateTime) {
-            showError("Время окончания должно быть после времени начала.");
-            throw new Error(
-              "Время окончания должно быть после времени начала."
-            );
-          }
           intervalsToAdd.push({
             booking_date: currentDate.toISOString().split("T")[0],
             start_time: startTime,
@@ -182,14 +163,12 @@ export default function AddInterval() {
     !startTime || 
     !endTime;
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !isButtonDisabled) {
-      addInterval();
-    }
-  };
+  const submitInterval = form.handleSubmit(addInterval, (errors) => {
+    showError(Object.values(errors)[0]?.message || "Проверьте данные интервала.");
+  });
 
   return (
-    <div className="account-form interval" onKeyDown={handleKeyDown}>
+    <form className="account-form interval" onSubmit={submitInterval} noValidate>
       {(message || error) && (
         <div
           className={`auth-message ${error ? "error" : "success"} ${
@@ -260,7 +239,6 @@ export default function AddInterval() {
               aria-label="Выберите время начала"
               inputId="startTime-input"
               noOptionsMessage={() => "Нет доступных вариантов"}
-              onKeyDown={handleKeyDown}
             />
           </div>
           <div className="time-select">
@@ -278,19 +256,18 @@ export default function AddInterval() {
               aria-label="Выберите время окончания"
               inputId="endTime-input"
               noOptionsMessage={() => "Нет доступных вариантов"}
-              onKeyDown={handleKeyDown}
             />
           </div>
           <button
-            onClick={addInterval}
+            type="submit"
             className="form-button"
-            disabled={isButtonDisabled}
-            aria-disabled={isButtonDisabled}
+            disabled={isButtonDisabled || form.formState.isSubmitting}
+            aria-disabled={isButtonDisabled || form.formState.isSubmitting}
           >
             Добавить интервал
           </button>
         </div>
       </div>
-    </div>
+    </form>
   );
 }

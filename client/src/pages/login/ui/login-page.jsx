@@ -1,3 +1,8 @@
+import { loginSchema } from "../model/login-schema.js";
+import { cleanPhoneNumber } from "@/shared/lib/phone.js";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useFormField } from "@/shared/lib/use-form-field.js";
 import React, { useState, useEffect } from "react";
 import { api } from "@/shared/api";
 import { Link, useNavigate } from "react-router-dom";
@@ -14,8 +19,15 @@ import "@/shared/ui/styles/auth.css";
 import "@/shared/ui/styles/auth-background.css";
 
 function Login() {
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
+  const form = useForm({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      phone: "",
+      password: "",
+    },
+  });
+  const [phone, setPhone] = useFormField(form, "phone");
+  const [password, setPassword] = useFormField(form, "password");
   const [showPassword, setShowPassword] = useState(false);
   const [inputError, setInputError] = useState({
     phone: false,
@@ -64,25 +76,11 @@ function Login() {
     setPhone(formatted);
   };
 
-  const getCleanPhoneNumber = () => {
-    const cleanPhone = phone.replace(/\D/g, "");
-    return cleanPhone.length === 10 ? "7" + cleanPhone : cleanPhone;
-  };
-
-  const login = async () => {
+  const login = async ({ phone, password }) => {
     showError("");
     setInputError({ phone: false, password: false });
 
-    const cleanPhone = getCleanPhoneNumber();
-
-    if (!cleanPhone || cleanPhone.length < 11 || !password) {
-      showError("Пожалуйста, введите корректный номер телефона и пароль.");
-      setInputError({
-        phone: !cleanPhone || cleanPhone.length < 11,
-        password: !password,
-      });
-      return;
-    }
+    const cleanPhone = cleanPhoneNumber(phone);
 
     try {
       const response = await api.post(
@@ -169,13 +167,12 @@ function Login() {
     }
   }, [navigate]);
 
-  const isButtonDisabled = !(getCleanPhoneNumber().length >= 11) || !password;
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !isButtonDisabled) {
-      login();
-    }
-  };
+  const isButtonDisabled = !loginSchema.safeParse({ phone, password }).success ||
+    form.formState.isSubmitting;
+  const submitLogin = form.handleSubmit(login, (errors) => {
+    setInputError({ phone: Boolean(errors.phone), password: Boolean(errors.password) });
+    showError("Пожалуйста, введите корректный номер телефона и пароль.");
+  });
 
   return (
     <div className="auth-page auth-background">
@@ -205,7 +202,7 @@ function Login() {
               </p>
             )}
 
-            <div className="auth-form">
+            <form className="auth-form" noValidate onSubmit={submitLogin}>
               <label
                 className={`auth-label ${
                   inputError.phone ? "error-label" : ""
@@ -225,7 +222,6 @@ function Login() {
                   aria-describedby="phoneError"
                   required
                   maxLength={18}
-                  onKeyDown={handleKeyDown}
                 />
                 {inputError.phone && (
                   <span id="phoneError" className="error-message">
@@ -254,8 +250,7 @@ function Login() {
                     maxLength={16}
                     aria-describedby="passwordError"
                     required
-                    onKeyDown={handleKeyDown}
-                  />
+                    />
                   <FontAwesomeIcon
                     icon={showPassword ? faEyeSlash : faEye}
                     className="passwordIcon"
@@ -282,13 +277,13 @@ function Login() {
 
               <button
                 className="auth-button"
-                onClick={login}
+                type="submit"
                 disabled={isButtonDisabled}
                 aria-disabled={isButtonDisabled}
               >
                 Войти
               </button>
-            </div>
+            </form>
 
             <div className="auth-links">
               <p>

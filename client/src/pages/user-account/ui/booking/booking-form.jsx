@@ -1,3 +1,7 @@
+import { bookingSchema } from "../../model/booking-schema.js";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useFormField } from "@/shared/lib/use-form-field.js";
 import React, { useState, useEffect, useCallback } from "react";
 import { api } from "@/shared/api";
 import Calendar from "./calendar.jsx";
@@ -13,21 +17,31 @@ import Select from "react-select";
 import Cookies from "js-cookie";
 
 function BookingForm({ userId, token }) {
-  const [bookingDate, setBookingDate] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
-  const [additionalServices, setAdditionalServices] = useState({
-    broom: { selected: false, quantity: 0 },
-    towel: { selected: false, quantity: 0 },
-    hat: { selected: false, quantity: 0 },
-    sheets: { selected: false, quantity: 0 },
+  const form = useForm({
+    resolver: zodResolver(bookingSchema),
+    defaultValues: {
+      bookingDate: "",
+      startTime: "",
+      endTime: "",
+      additionalServices: {
+        broom: { selected: false, quantity: 0 },
+        towel: { selected: false, quantity: 0 },
+        hat: { selected: false, quantity: 0 },
+        sheets: { selected: false, quantity: 0 },
+      },
+      additionalServicesQuantity: {
+        broom: 0,
+        towel: 0,
+        hat: 0,
+        sheets: 0,
+      },
+    },
   });
-  const [additionalServicesQuantity, setAdditionalServicesQuantity] = useState({
-    broom: 0,
-    towel: 0,
-    hat: 0,
-    sheets: 0,
-  });
+  const [bookingDate, setBookingDate] = useFormField(form, "bookingDate");
+  const [startTime, setStartTime] = useFormField(form, "startTime");
+  const [endTime, setEndTime] = useFormField(form, "endTime");
+  const [additionalServices, setAdditionalServices] = useFormField(form, "additionalServices");
+  const [additionalServicesQuantity, setAdditionalServicesQuantity] = useFormField(form, "additionalServicesQuantity");
   const [price, setPrice] = useState(0);
   const [availableStartTimes, setAvailableStartTimes] = useState([]);
   const [availableEndTimes, setAvailableEndTimes] = useState([]);
@@ -303,8 +317,7 @@ function BookingForm({ userId, token }) {
     label: interval.startTime,
   }));
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const submitBooking = async ({ bookingDate, startTime, endTime, additionalServices, additionalServicesQuantity }) => {
     const token = Cookies.get("token");
 
     const startTimeDate = startTime
@@ -328,9 +341,6 @@ function BookingForm({ userId, token }) {
     const discountId =
       appliedDiscounts.length > 0 ? appliedDiscounts[0].id : null;
     try {
-      if (!bookingDate || !startTime || !endTime) {
-        throw new Error("Пожалуйста, выберите дату и время.");
-      }
       const response = await api.post(
         `/api/userAccount/${userId}/book`,
         {
@@ -463,7 +473,9 @@ function BookingForm({ userId, token }) {
         )}
 
         <form
-          onSubmit={handleSubmit}
+          onSubmit={form.handleSubmit(submitBooking, (errors) => {
+            showError(Object.values(errors)[0]?.message || "Проверьте данные бронирования.");
+          })}
           className="booking-wrapper"
           aria-labelledby="bookingFormTitle"
         >
@@ -581,8 +593,8 @@ function BookingForm({ userId, token }) {
               <button
                 type="submit"
                 className="form-button"
-                disabled={!bookingDate || !startTime || !endTime}
-                aria-disabled={!bookingDate || !startTime || !endTime}
+                disabled={!bookingDate || !startTime || !endTime || form.formState.isSubmitting}
+                aria-disabled={!bookingDate || !startTime || !endTime || form.formState.isSubmitting}
               >
                 Забронировать
               </button>

@@ -1,3 +1,7 @@
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { cleanPhoneNumber, verificationCodeSchema } from "@/shared/lib/phone.js";
+import { registrationSchema, registrationVerificationSchema } from "../model/registration-schema.js";
 import { useState } from "react";
 import { api } from "@/shared/api";
 import { useNavigate, Link } from "react-router-dom";
@@ -34,20 +38,24 @@ const usePasswordToggle = (initialState = false) => {
 };
 
 function Register() {
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    password: "",
-    confirmPassword: "",
-    phoneNumber: "",
-    verificationCode: "",
-  });
-
   const [uiState, setUiState] = useState({
     isCodeSent: false,
     canResendCode: true,
     isSubmitting: false,
   });
+
+  const form = useForm({
+    resolver: zodResolver(uiState.isCodeSent ? registrationVerificationSchema : registrationSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      password: "",
+      confirmPassword: "",
+      phoneNumber: "",
+      verificationCode: "",
+    },
+  });
+  const formData = form.watch();
 
   const passwordToggle = usePasswordToggle();
   const confirmPasswordToggle = usePasswordToggle();
@@ -77,17 +85,12 @@ function Register() {
     const previousValue = formData.phoneNumber;
 
     if (input.length < previousValue.length) {
-      setFormData((prev) => ({ ...prev, phoneNumber: input }));
+      form.setValue("phoneNumber", input);
       return;
     }
 
     const formatted = formatPhoneNumber(input);
-    setFormData((prev) => ({ ...prev, phoneNumber: formatted }));
-  };
-
-  const getCleanPhoneNumber = () => {
-    const cleanPhone = formData.phoneNumber.replace(/\D/g, "");
-    return cleanPhone.length === 10 ? "7" + cleanPhone : cleanPhone;
+    form.setValue("phoneNumber", formatted);
   };
 
   const handleInputChange = (e) => {
@@ -95,15 +98,15 @@ function Register() {
     if (id === "phoneNumber") {
       handlePhoneChange(e);
     } else {
-      setFormData((prev) => ({ ...prev, [id]: value }));
+      form.setValue(id, value);
     }
   };
 
-  const sendVerificationCode = async () => {
+  const sendVerificationCode = async ({ phoneNumber }) => {
     setUiState((prev) => ({ ...prev, isSubmitting: true }));
 
     try {
-      const cleanPhone = getCleanPhoneNumber();
+      const cleanPhone = cleanPhoneNumber(phoneNumber);
       const response = await api.post(
         `/api/register`,
         {
@@ -132,24 +135,19 @@ function Register() {
     }
   };
 
-  const register = async () => {
-    if (formData.password !== formData.confirmPassword) {
-      showError("Пароли не совпадают!");
-      return;
-    }
-
+  const register = async (values) => {
     setUiState((prev) => ({ ...prev, isSubmitting: true }));
 
     try {
-      const cleanPhone = getCleanPhoneNumber();
+      const cleanPhone = cleanPhoneNumber(values.phoneNumber);
       const response = await api.post(
         "/api/verify-registration",
         {
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          password: formData.password,
+          first_name: values.firstName,
+          last_name: values.lastName,
+          password: values.password,
           phone_number: cleanPhone,
-          verification_code: formData.verificationCode,
+          verification_code: values.verificationCode,
         },
         {
           withCredentials: true,
@@ -179,20 +177,15 @@ function Register() {
     }
   };
 
-  const isFormValid =
-    formData.firstName &&
-    formData.lastName &&
-    formData.password &&
-    formData.confirmPassword &&
-    getCleanPhoneNumber().length >= 11;
-
-  const isVerificationFormValid = formData.verificationCode.length === 4;
-
-  const handleButtonKeyDown = (e, callback) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      callback();
-    }
+  const isFormValid = registrationSchema.safeParse(formData).success;
+  const isVerificationFormValid = verificationCodeSchema.safeParse(formData.verificationCode).success;
+  const showValidationError = (errors) => showError(Object.values(errors)[0].message);
+  const requestCode = form.handleSubmit(sendVerificationCode, showValidationError);
+  const submitRegistration = form.handleSubmit(register, showValidationError);
+  const resendCode = () => {
+    const result = registrationSchema.safeParse(form.getValues());
+    if (result.success) return sendVerificationCode(result.data);
+    showError(result.error.issues[0].message);
   };
 
   const renderPasswordIcon = (toggleProps) => (
@@ -246,223 +239,216 @@ function Register() {
               </p>
             )}
 
-            <div className="auth-form">
-              <div className="auth-row">
-                <div className="auth-column">
-                  <label className="auth-label" htmlFor="firstName">
-                    Имя
-                    <input
-                      type="text"
-                      id="firstName"
-                      className="auth-input"
-                      placeholder="Введите имя"
-                      maxLength={20}
-                      onChange={(e) => handleInputChange(e, "Имя")}
-                      value={formData.firstName}
-                      required
-                      aria-required="true"
-                      aria-describedby="firstNameError"
-                    />
-                    <span
-                      id="firstNameError"
-                      className="screen-reader-only"
-                    ></span>
-                  </label>
-
-                  <label className="auth-label" htmlFor="lastName">
-                    Фамилия
-                    <input
-                      type="text"
-                      id="lastName"
-                      className="auth-input"
-                      placeholder="Введите фамилию"
-                      maxLength={20}
-                      onChange={(e) => handleInputChange(e, "Фамилия")}
-                      value={formData.lastName}
-                      required
-                      aria-required="true"
-                      aria-describedby="lastNameError"
-                    />
-                    <span
-                      id="lastNameError"
-                      className="screen-reader-only"
-                    ></span>
-                  </label>
-                </div>
-
-                <div className="auth-column">
-                  <label className="auth-label" htmlFor="password">
-                    Пароль
-                    <div className="passwordInput">
-                      <input
-                        type={passwordToggle.type}
-                        id="password"
-                        className="auth-input"
-                        placeholder="Введите пароль"
-                        maxLength={16}
-                        onChange={(e) => handleInputChange(e, "Пароль")}
-                        value={formData.password}
-                        required
-                        aria-required="true"
-                        aria-describedby="passwordError"
-                      />
-                      {renderPasswordIcon(passwordToggle)}
-                    </div>
-                    <span
-                      id="passwordError"
-                      className="screen-reader-only"
-                    ></span>
-                  </label>
-
-                  <label className="auth-label" htmlFor="confirmPassword">
-                    Проверка пароля
-                    <div className="passwordInput">
-                      <input
-                        type={confirmPasswordToggle.type}
-                        id="confirmPassword"
-                        className="auth-input"
-                        placeholder="Повторите пароль"
-                        maxLength={16}
-                        onChange={(e) =>
-                          handleInputChange(e, "Проверка пароля")
-                        }
-                        value={formData.confirmPassword}
-                        required
-                        aria-required="true"
-                        aria-describedby="confirmPasswordError"
-                      />
-                      {renderPasswordIcon(confirmPasswordToggle)}
-                    </div>
-                    <span
-                      id="confirmPasswordError"
-                      className="screen-reader-only"
-                    ></span>
-                  </label>
-                </div>
-
-                <div className="auth-column">
-                  <label className="auth-label" htmlFor="phoneNumber">
-                    Номер телефона
-                    <input
-                      type="tel"
-                      id="phoneNumber"
-                      className="auth-input"
-                      placeholder="+7 (XXX) XXX-XX-XX"
-                      maxLength={18}
-                      onChange={(e) => handleInputChange(e, "Номер телефона")}
-                      value={formData.phoneNumber}
-                      required
-                      aria-required="true"
-                      aria-describedby="phoneNumberError"
-                    />
-                    <span
-                      id="phoneNumberError"
-                      className="screen-reader-only"
-                    ></span>
-                  </label>
-
-                  {isFormValid && (
-                    <label className="auth-label" htmlFor="verificationCode">
-                      Код верификации
+            <form noValidate onSubmit={uiState.isCodeSent ? submitRegistration : requestCode}>
+              <div className="auth-form">
+                <div className="auth-row">
+                  <div className="auth-column">
+                    <label className="auth-label" htmlFor="firstName">
+                      Имя
                       <input
                         type="text"
-                        id="verificationCode"
+                        {...form.register("firstName")}
+                        id="firstName"
                         className="auth-input"
-                        placeholder="Введите код"
-                        maxLength={4}
-                        onChange={(e) =>
-                          handleInputChange(e, "Код верификации")
-                        }
-                        onKeyDown={(e) => {
-                          if (
-                            e.key === "Enter" &&
-                            isFormValid &&
-                            !uiState.isCodeSent
-                          ) {
-                            e.preventDefault();
-                            sendVerificationCode();
-                          }
-                        }}
-                        value={formData.verificationCode}
+                        placeholder="Введите имя"
+                        maxLength={20}
+                        onChange={(e) => handleInputChange(e, "Имя")}
+                        value={formData.firstName}
                         required
                         aria-required="true"
-                        aria-describedby="verificationCodeError"
+                        aria-describedby="firstNameError"
                       />
                       <span
-                        id="verificationCodeError"
+                        id="firstNameError"
                         className="screen-reader-only"
                       ></span>
                     </label>
-                  )}
+
+                    <label className="auth-label" htmlFor="lastName">
+                      Фамилия
+                      <input
+                        type="text"
+                        {...form.register("lastName")}
+                        id="lastName"
+                        className="auth-input"
+                        placeholder="Введите фамилию"
+                        maxLength={20}
+                        onChange={(e) => handleInputChange(e, "Фамилия")}
+                        value={formData.lastName}
+                        required
+                        aria-required="true"
+                        aria-describedby="lastNameError"
+                      />
+                      <span
+                        id="lastNameError"
+                        className="screen-reader-only"
+                      ></span>
+                    </label>
+                  </div>
+
+                  <div className="auth-column">
+                    <label className="auth-label" htmlFor="password">
+                      Пароль
+                      <div className="passwordInput">
+                        <input
+                          type={passwordToggle.type}
+                          {...form.register("password")}
+                          id="password"
+                          className="auth-input"
+                          placeholder="Введите пароль"
+                          maxLength={16}
+                          onChange={(e) => handleInputChange(e, "Пароль")}
+                          value={formData.password}
+                          required
+                          aria-required="true"
+                          aria-describedby="passwordError"
+                        />
+                        {renderPasswordIcon(passwordToggle)}
+                      </div>
+                      <span
+                        id="passwordError"
+                        className="screen-reader-only"
+                      ></span>
+                    </label>
+
+                    <label className="auth-label" htmlFor="confirmPassword">
+                      Проверка пароля
+                      <div className="passwordInput">
+                        <input
+                          type={confirmPasswordToggle.type}
+                          {...form.register("confirmPassword")}
+                          id="confirmPassword"
+                          className="auth-input"
+                          placeholder="Повторите пароль"
+                          maxLength={16}
+                          onChange={(e) =>
+                            handleInputChange(e, "Проверка пароля")
+                          }
+                          value={formData.confirmPassword}
+                          required
+                          aria-required="true"
+                          aria-describedby="confirmPasswordError"
+                        />
+                        {renderPasswordIcon(confirmPasswordToggle)}
+                      </div>
+                      <span
+                        id="confirmPasswordError"
+                        className="screen-reader-only"
+                      ></span>
+                    </label>
+                  </div>
+
+                  <div className="auth-column">
+                    <label className="auth-label" htmlFor="phoneNumber">
+                      Номер телефона
+                      <input
+                        type="tel"
+                        {...form.register("phoneNumber")}
+                        id="phoneNumber"
+                        className="auth-input"
+                        placeholder="+7 (XXX) XXX-XX-XX"
+                        maxLength={18}
+                        onChange={(e) => handleInputChange(e, "Номер телефона")}
+                        value={formData.phoneNumber}
+                        required
+                        aria-required="true"
+                        aria-describedby="phoneNumberError"
+                      />
+                      <span
+                        id="phoneNumberError"
+                        className="screen-reader-only"
+                      ></span>
+                    </label>
+
+                    {isFormValid && (
+                      <label className="auth-label" htmlFor="verificationCode">
+                        Код верификации
+                        <input
+                          type="text"
+                          {...form.register("verificationCode")}
+                          id="verificationCode"
+                          className="auth-input"
+                          placeholder="Введите код"
+                          maxLength={4}
+                          onChange={(e) =>
+                            handleInputChange(e, "Код верификации")
+                          }
+
+                          value={formData.verificationCode}
+                          required
+                          aria-required="true"
+                          aria-describedby="verificationCodeError"
+                        />
+                        <span
+                          id="verificationCodeError"
+                          className="screen-reader-only"
+                        ></span>
+                      </label>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {!uiState.isCodeSent && !isFormValid && (
-              <button
-                className="auth-button"
-                onClick={sendVerificationCode}
-                onKeyDown={(e) => handleButtonKeyDown(e, sendVerificationCode)}
-                disabled={!isFormValid || uiState.isSubmitting}
-                aria-busy={uiState.isSubmitting}
-                aria-live="polite"
-              >
-                Зарегистрироваться
-              </button>
-            )}
-
-            {isFormValid && !uiState.isCodeSent && (
-              <>
-                <p className="auth-info">
-                  На Ваш номер телефона поступит звонок, введите последние 4
-                  цифры номера.
-                </p>
+              {!uiState.isCodeSent && !isFormValid && (
                 <button
                   className="auth-button"
-                  onClick={sendVerificationCode}
-                  onKeyDown={(e) =>
-                    handleButtonKeyDown(e, sendVerificationCode)
-                  }
+                  type="submit"
                   disabled={!isFormValid || uiState.isSubmitting}
                   aria-busy={uiState.isSubmitting}
                   aria-live="polite"
                 >
-                  {uiState.isSubmitting ? "Отправка..." : "Отправить код"}
+                  Зарегистрироваться
                 </button>
-              </>
-            )}
+              )}
 
-            {uiState.isCodeSent && (
-              <>
-                <button
-                  className="auth-button"
-                  onClick={register}
-                  onKeyDown={(e) => handleButtonKeyDown(e, register)}
-                  disabled={!isVerificationFormValid || uiState.isSubmitting}
-                  aria-busy={uiState.isSubmitting}
-                  aria-live="polite"
-                >
-                  {uiState.isSubmitting
-                    ? "Регистрация..."
-                    : "Зарегистрироваться"}
-                </button>
-
-                {uiState.canResendCode && (
+              {isFormValid && !uiState.isCodeSent && (
+                <>
+                  <p className="auth-info">
+                    На Ваш номер телефона поступит звонок, введите последние 4
+                    цифры номера.
+                  </p>
                   <button
                     className="auth-button"
-                    onClick={sendVerificationCode}
-                    onKeyDown={(e) =>
-                      handleButtonKeyDown(e, sendVerificationCode)
-                    }
-                    disabled={uiState.isSubmitting}
+                    type="submit"
+                    disabled={!isFormValid || uiState.isSubmitting}
                     aria-busy={uiState.isSubmitting}
                     aria-live="polite"
                   >
-                    Отправить код еще раз
+                    {uiState.isSubmitting ? "Отправка..." : "Отправить код"}
                   </button>
-                )}
-              </>
-            )}
+                </>
+              )}
+
+              {uiState.isCodeSent && (
+                <>
+                  <button
+                    className="auth-button"
+                    type="submit"
+                    disabled={!isVerificationFormValid || uiState.isSubmitting}
+                    aria-busy={uiState.isSubmitting}
+                    aria-live="polite"
+                  >
+                    {uiState.isSubmitting
+                      ? "Регистрация..."
+                      : "Зарегистрироваться"}
+                  </button>
+
+                  {uiState.canResendCode && (
+                    <button
+                      className="auth-button"
+                      type="button"
+                      onClick={resendCode}
+                      disabled={uiState.isSubmitting}
+                      aria-busy={uiState.isSubmitting}
+                      aria-live="polite"
+                    >
+                      Отправить код еще раз
+                    </button>
+                  )}
+                </>
+              )}
+
+            </form>
 
             <div className="auth-links">
               <p>
