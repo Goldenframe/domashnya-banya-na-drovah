@@ -6,7 +6,7 @@
 
 .additional-services-container {
   flex: 1;
-  align-self: flex-end; /* Добавьте это */
+  align-self: flex-end;
 }
 .service-item {
   flex: 1;
@@ -113,9 +113,9 @@
 }
 
 .service-quantity-input {
-  appearance: none; /* Для Chrome, Edge, Safari и других браузеров */
-  -webkit-appearance: none; /* Для Webkit-браузеров (Chrome, Safari) */
-  -moz-appearance: textfield; /* Для Firefox */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
   padding: 5px;
   text-align: center;
   border: none;

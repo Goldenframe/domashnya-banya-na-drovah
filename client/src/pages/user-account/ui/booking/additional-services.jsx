@@ -24,7 +24,6 @@ export default function AdditionalServices({
       if (discount.discount_type !== "free" || !isDiscountApplicable(discount))
         return;
 
-      // Применяем скидку ко всем услугам, если applicable_services пуст
       const applicableServices =
         discount.applicable_services.length > 0
           ? discount.applicable_services
@@ -33,7 +32,6 @@ export default function AdditionalServices({
       applicableServices.forEach((service) => {
         const quantity = additionalServices[service]?.quantity || 0;
 
-        // Проверяем минимальное количество для скидки
         const minCount = parseInt(
           discount.min_service_counts?.[service] || "0",
           10

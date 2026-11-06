@@ -118,25 +118,18 @@
 
 @media (max-width: 1024px) {
   .discount-container .additional-services {
-    grid-template-columns: 1fr; /* Один столбец на планшетах */
+    grid-template-columns: 1fr;
     gap: 20px;
   }
 
-  /* .discount-container .service-item {
-    flex-direction: column;
-    align-items: flex-start;
-  } */
 
-  /* .discount-container .additional-services .service-item span {
-    font-size: 16px;
-  } */
 
   .discount-info {
     padding: 12px 20px;
   }
 
   .discount-card-container {
-    grid-template-columns: repeat(auto-fill, minmax(45%, 1fr)); /* Два столбца */
+    grid-template-columns: repeat(auto-fill, minmax(45%, 1fr));
   }
 }
 
@@ -149,7 +142,7 @@
 
 
   .discount-card-container {
-    grid-template-columns: 1fr; /* Один столбец */
+    grid-template-columns: 1fr;
     gap: 20px;
     width: 90%;
   }
@@ -189,7 +182,7 @@
 
 
   .discount-card-container {
-    grid-template-columns: 1fr; /* Один столбец */
+    grid-template-columns: 1fr;
     gap: 15px;
   }
 

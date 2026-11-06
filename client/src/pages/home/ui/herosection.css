@@ -1,6 +1,6 @@
 .hero {
   margin-top: 60px;
-  position: relative; /* Добавляем для позиционирования фона */
+  position: relative;
 }
 
 .hero__container {
@@ -17,8 +17,8 @@
   height: 480px;
   flex: 1;
   min-width: 300px;
-  position: relative; /* Для z-index */
-  z-index: 2; /* Чтобы контент был поверх фона */
+  position: relative;
+  z-index: 2;
 }
 
 .hero__title {
@@ -73,9 +73,8 @@
   object-fit: cover;
 }
 
-/* Фоновые стили для мобильной версии */
 .hero__background {
-  display: none; /* По умолчанию скрыт */
+  display: none;
   position: absolute;
   top: 0;
   left: 0;
@@ -90,7 +89,6 @@
   object-fit: cover;
 }
 
-/* Адаптивные стили */
 @media (max-width: 1264px) {
   .hero__container {
     max-width: 1100px;

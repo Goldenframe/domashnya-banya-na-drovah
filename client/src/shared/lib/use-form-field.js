@@ -1,7 +1,6 @@
 import { useCallback } from "react";
 import { useController } from "react-hook-form";
 
-// Calendars and custom inputs can also update a field from its previous value.
 export function useFormField({ control, getValues, setValue }, name) {
   const { field } = useController({ control, name });
   const update = useCallback((value) => {

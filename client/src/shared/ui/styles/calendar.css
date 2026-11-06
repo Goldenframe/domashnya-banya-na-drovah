@@ -85,7 +85,7 @@
   cursor: pointer;
   background-color: transparent;
   color: #fffdf9;
-  font-size: 1.5em; /* Увеличиваем размер стрелочек */
+  font-size: 1.5em;
   padding: 0;
   margin: 0;
   width: 15px;
@@ -214,8 +214,8 @@
   .calendar_container {
     justify-content: center;
     align-items: center;
-    max-width: 320px; /* Ограничиваем ширину */
-    margin: 0 auto; /* Выравниваем по центру */
+    max-width: 320px;
+    margin: 0 auto;
   }
 
   .calendar_header span {

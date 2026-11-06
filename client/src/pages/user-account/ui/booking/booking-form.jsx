@@ -194,10 +194,8 @@ function BookingForm({ userId, token }) {
     const dayOfWeek = startCopy.getDay();
 
     if (dayOfWeek === 0 || dayOfWeek === 6) {
-      // Выходные
       cost = hours <= 2 ? 3800 : Math.round(1600 * hours);
     } else {
-      // Будни
       if (startHour >= 8 && startHour < 16) {
         cost = hours <= 2 ? 3500 : Math.round(1500 * hours);
       } else if (startHour >= 16 || startHour < 8) {

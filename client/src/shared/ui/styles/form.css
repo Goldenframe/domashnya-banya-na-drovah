@@ -41,7 +41,6 @@ fieldset.date-selection-method legend {
   margin: 0;
 }
 
-/* Ваши существующие стили кнопок (оставляем без изменений) */
 .mode-btn {
   background: none;
   border: none;
@@ -62,9 +61,8 @@ fieldset.date-selection-method legend {
   color: #63523b;
 }
 
-/* Дополнительный стиль для контейнера кнопок */
 .method-buttons {
-  display: inline-block; /* или flex, если нужно */
+  display: inline-block;
 }
 .time-select__control {
   -webkit-appearance: none !important;
