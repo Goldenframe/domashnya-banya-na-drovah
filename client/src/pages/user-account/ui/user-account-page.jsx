@@ -1,13 +1,13 @@
 import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { Link, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import Loader from '@/shared/ui/loader';
+import { UserAccountHeader } from '@/widgets/account-navigation';
 import Cookies from 'js-cookie';
 import UserFooter from './user-footer.jsx';
 
 const BookingForm = lazy(() => import('./booking/booking-form.jsx'));
 const UserBookings = lazy(() => import('./bookings/user-bookings.jsx'));
 const EditProfile = lazy(() => import('@/features/edit-profile'));
-const UserAccountHeader = lazy(() => import("@/widgets/account-navigation").then((module) => ({ default: module.UserAccountHeader })));
 const UserUpcomingBookings = lazy(() => import('./bookings/user-upcoming-bookings.jsx'));
 const UserPastBookings = lazy(() => import('./bookings/user-past-bookings.jsx'));
 
@@ -49,9 +49,7 @@ function UserAccount() {
 
     return (
         <div>
-            <Suspense fallback={<Loader />}>
-                <UserAccountHeader userId={userData.userId} />
-            </Suspense>
+            <UserAccountHeader userId={userData.userId} />
             <main className="account-container">
                 <Suspense fallback={<Loader />}>
                     <Routes>
