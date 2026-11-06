@@ -1,8 +1,12 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  calendarQuery, createBooking, endTimesQuery, refreshBookings, startTimesQuery,
+} from "../../api/booking-queries.js";
 import { bookingSchema } from "../../model/booking-schema.js";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFormField } from "@/shared/lib/use-form-field.js";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { api } from "@/shared/api";
 import Calendar from "./calendar.jsx";
 import AdditionalServices from "./additional-services.jsx";
@@ -14,7 +18,6 @@ import "@/shared/ui/styles/form.css";
 import "./booking.css";
 
 import Select from "react-select";
-import Cookies from "js-cookie";
 
 function BookingForm({ userId, token }) {
   const form = useForm({
@@ -43,81 +46,52 @@ function BookingForm({ userId, token }) {
   const [additionalServices, setAdditionalServices] = useFormField(form, "additionalServices");
   const [additionalServicesQuantity, setAdditionalServicesQuantity] = useFormField(form, "additionalServicesQuantity");
   const [price, setPrice] = useState(0);
-  const [availableStartTimes, setAvailableStartTimes] = useState([]);
-  const [availableEndTimes, setAvailableEndTimes] = useState([]);
-  const [availableDates, setAvailableDates] = useState([]);
   const [discounts, setDiscounts] = useState([]);
   const [timeLimitDiscount, setTimeLimitDiscount] = useState("");
   const [noTimeLimitDiscount, setNoTimeLimitDiscount] = useState("");
   const { message, showMessage, error, showError, isVisible } =
     useShowMessage();
-  const today = new Date();
-  const maxDate = new Date(today);
-  maxDate.setDate(today.getDate() + 21);
+  const queryClient = useQueryClient();
+  const hasSelectedInitialDate = useRef(false);
+  const [datesToCheck] = useState(() => Array.from({ length: 62 }, (_, offset) => {
+    const date = new Date();
+    date.setDate(date.getDate() + offset);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return [year, month, day].join("-");
+  }));
+  const calendar = useQuery(calendarQuery(queryClient, userId, token, datesToCheck));
+  const availableDates = calendar.data?.availableDates ?? [];
+  const startTimes = useQuery({ ...startTimesQuery(userId, token, bookingDate), staleTime: 30 * 1000 });
+  const availableStartTimes = startTimes.data ?? [];
+  const intervalId = availableStartTimes.find((interval) => interval.startTime === startTime)?.intervalId;
+  const endTimes = useQuery(endTimesQuery(userId, token, bookingDate, startTime, intervalId));
+  const availableEndTimes = endTimes.data ?? [];
+  const bookingMutation = useMutation({
+    mutationFn: (booking) => createBooking(userId, token, booking),
+    onSuccess: (_, booking) => refreshBookings(queryClient, userId, booking.booking_date),
+  });
 
-  const fetchAvailableIntervals = useCallback(async () => {
-    try {
-      const token = Cookies.get("token");
-
-      const response = await api.get(
-        `/api/userAccount/${userId}/availableIntervals/${bookingDate}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      let filteredIntervals = response.data.availableStartTimes;
-
-      setAvailableStartTimes(filteredIntervals);
-      showMessage("");
-    } catch (error) {
-      console.error("Ошибка при получении интервалов:", error);
-      showError("Произошла ошибка при получении доступных интервалов.");
-    }
-  }, [userId, bookingDate]);
-
-  const fetchAvailableEndTimes = useCallback(
-    async (startTime, intervalId) => {
-      try {
-        const token = Cookies.get("token");
-        const response = await api.get(
-          `/api/userAccount/${userId}/availableEndTimes/${bookingDate}/${startTime}/${intervalId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        if (response.data.availableEndTimes.length === 0) {
-          setAvailableStartTimes((prev) =>
-            prev.filter((interval) => interval.startTime !== startTime)
-          );
-          showMessage(
-            "Нет доступных конечных времен для выбранного времени начала."
-          );
-          setAvailableEndTimes([]);
-        } else {
-          const endTimes = response.data.availableEndTimes.map(
-            (time) => time.endTime
-          );
-          if (!endTimes.includes("24:00")) {
-            const intervalEnd = "24:00";
-            endTimes.push(intervalEnd);
-          }
-          setAvailableEndTimes(endTimes);
-          showMessage("");
-        }
-      } catch (error) {
-        console.error("Ошибка при получении конечных времен:", error);
-        showError("Произошла ошибка при получении доступных конечных времен.");
-      }
-    },
-    [userId, bookingDate]
-  );
   useEffect(() => {
-    if (bookingDate) {
-      fetchAvailableIntervals();
+    if (!hasSelectedInitialDate.current && calendar.data?.availableDates.length) {
+      hasSelectedInitialDate.current = true;
+      setBookingDate(calendar.data.availableDates[0]);
     }
-  }, [bookingDate, fetchAvailableIntervals]);
+  }, [calendar.data, setBookingDate]);
+
+  useEffect(() => {
+    if (startTime && startTimes.isSuccess && intervalId == null) {
+      setStartTime("");
+      setEndTime("");
+    }
+  }, [startTime, startTimes.isSuccess, intervalId, setStartTime, setEndTime]);
+
+  useEffect(() => {
+    if (endTime && endTimes.isSuccess && !endTimes.data.includes(endTime)) {
+      setEndTime("");
+    }
+  }, [endTime, endTimes.isSuccess, endTimes.data, setEndTime]);
 
   useEffect(() => {
     let discountTimeLimit = discounts.filter(
@@ -138,22 +112,15 @@ function BookingForm({ userId, token }) {
     );
   }, [bookingDate, discounts]);
 
+  const handleDateChange = (date) => {
+    setBookingDate(date);
+    setStartTime("");
+    setEndTime("");
+  };
+
   const handleTimeChange = (selectedOption) => {
-    const selectedStartTime = selectedOption.value;
-    setStartTime(selectedStartTime);
-    const selectedInterval = availableStartTimes.find(
-      (interval) => interval.startTime === selectedStartTime
-    );
-
-    if (selectedInterval) {
-      fetchAvailableEndTimes(selectedStartTime, selectedInterval.intervalId);
-
-      if (endTime) {
-        updatePrice(selectedStartTime, endTime);
-      }
-    } else {
-      setAvailableEndTimes([]);
-    }
+    setStartTime(selectedOption?.value ?? "");
+    setEndTime("");
   };
 
   const updatePrice = async (start, end) => {
@@ -173,7 +140,7 @@ function BookingForm({ userId, token }) {
 
   useEffect(() => {
     updatePrice(startTime, endTime);
-  }, [additionalServices, bookingDate]);
+  }, [additionalServices, bookingDate, startTime, endTime, discounts]);
 
   const fetchDiscounts = async () => {
     try {
@@ -193,11 +160,6 @@ function BookingForm({ userId, token }) {
   useEffect(() => {
     fetchDiscounts();
   }, [userId]);
-
-  useEffect(() => {
-    setStartTime("");
-    setEndTime("");
-  }, [bookingDate]);
 
   const calculatePrice = async (start, end) => {
     console.log("--- CALCULATION START ---");
@@ -317,8 +279,14 @@ function BookingForm({ userId, token }) {
     label: interval.startTime,
   }));
 
+  const canBook = Boolean(bookingDate && startTime && endTime && intervalId != null &&
+    startTimes.isSuccess && endTimes.isSuccess && availableEndTimes.includes(endTime));
+
   const submitBooking = async ({ bookingDate, startTime, endTime, additionalServices, additionalServicesQuantity }) => {
-    const token = Cookies.get("token");
+    if (!canBook) {
+      showError("Выберите доступную дату и время.");
+      return;
+    }
 
     const startTimeDate = startTime
       ? new Date(`${bookingDate}T${startTime}`)
@@ -341,48 +309,30 @@ function BookingForm({ userId, token }) {
     const discountId =
       appliedDiscounts.length > 0 ? appliedDiscounts[0].id : null;
     try {
-      const response = await api.post(
-        `/api/userAccount/${userId}/book`,
-        {
-          booking_date: bookingDate,
-          start_time: startTime,
-          end_time: endTime,
-          price,
-          broom: additionalServices.broom.selected,
-          broom_quantity:
-            additionalServices.broom.quantity +
-            (additionalServicesQuantity.broom || 0),
-          towel: additionalServices.towel.selected,
-          towel_quantity:
-            additionalServices.towel.quantity +
-            (additionalServicesQuantity.towel || 0),
-          hat: additionalServices.hat.selected,
-          hat_quantity:
-            additionalServices.hat.quantity +
-            (additionalServicesQuantity.hat || 0),
-          sheets: additionalServices.sheets.selected,
-          sheets_quantity:
-            additionalServices.sheets.quantity +
-            (additionalServicesQuantity.sheets || 0),
-          discount_id: discountId,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await bookingMutation.mutateAsync({
+        booking_date: bookingDate,
+        start_time: startTime,
+        end_time: endTime,
+        price,
+        broom: additionalServices.broom.selected,
+        broom_quantity:
+          additionalServices.broom.quantity +
+          (additionalServicesQuantity.broom || 0),
+        towel: additionalServices.towel.selected,
+        towel_quantity:
+          additionalServices.towel.quantity +
+          (additionalServicesQuantity.towel || 0),
+        hat: additionalServices.hat.selected,
+        hat_quantity:
+          additionalServices.hat.quantity +
+          (additionalServicesQuantity.hat || 0),
+        sheets: additionalServices.sheets.selected,
+        sheets_quantity:
+          additionalServices.sheets.quantity +
+          (additionalServicesQuantity.sheets || 0),
+        discount_id: discountId,
+      });
       showMessage("Бронь успешно оформлена!");
-      const unavailableDates = await checkAvailability(
-        userId,
-        [bookingDate],
-        token
-      );
-      if (unavailableDates.includes(bookingDate)) {
-        setAvailableDates((prevDates) =>
-          prevDates.filter((date) => date !== bookingDate)
-        );
-      }
       setBookingDate("");
       setStartTime("");
       setEndTime("");
@@ -413,50 +363,6 @@ function BookingForm({ userId, token }) {
       console.error("Ошибка при бронировании:", err);
     }
   };
-  const checkAvailability = async (userId, selectedDates, token) => {
-    const unavailableDates = [];
-
-    for (const date of selectedDates) {
-      try {
-        const response = await api.get(
-          `/api/userAccount/${userId}/availableIntervals/${date}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        if (response.data.availableStartTimes.length === 0) {
-          unavailableDates.push(date);
-        }
-      } catch (error) {
-        console.error(
-          `Ошибка при проверке доступности для даты ${date}:`,
-          error
-        );
-      }
-    }
-
-    return unavailableDates;
-  };
-  useEffect(() => {
-    const datesToCheck = [];
-    for (let i = 0; i < 62; i++) {
-      const nextDate = new Date(today);
-      nextDate.setDate(today.getDate() + i);
-      datesToCheck.push(nextDate.toISOString().slice(0, 10));
-    }
-
-    checkAvailability(userId, datesToCheck, token).then((unavailableDates) => {
-      const filteredAvailableDates = datesToCheck.filter(
-        (date) => !unavailableDates.includes(date)
-      );
-      setAvailableDates(filteredAvailableDates);
-      if (filteredAvailableDates.length > 0) {
-        setBookingDate(filteredAvailableDates[0]);
-      }
-    });
-  }, [userId, token]);
-
   return (
     <section className="account-content">
       <div className="account-form book">
@@ -480,15 +386,29 @@ function BookingForm({ userId, token }) {
           aria-labelledby="bookingFormTitle"
         >
           <div className="calendar-container">
+            {calendar.isPending && <p role="status">Загружаем доступные даты…</p>}
+            {(calendar.isError || calendar.data?.failedDays > 0) && (
+              <div role="alert">
+                <p>{calendar.isError ? "Не удалось загрузить календарь." : "Часть дат не удалось проверить."}</p>
+                <button type="button" onClick={() => calendar.refetch()}>Повторить</button>
+              </div>
+            )}
             <Calendar
               availableDates={availableDates}
-              setAvailableDates={setAvailableDates}
-              setBookingDate={setBookingDate}
+              setBookingDate={handleDateChange}
               bookingDate={bookingDate}
             />
           </div>
 
           <div className="time-controls">
+            {(startTimes.isError || endTimes.isError) && (
+              <div role="alert">
+                <p>Не удалось загрузить доступное время.</p>
+                <button type="button" onClick={() => (startTimes.isError ? startTimes : endTimes).refetch()}>
+                  Повторить
+                </button>
+              </div>
+            )}
             {noTimeLimitDiscount.length > 0 && (
               <section
                 aria-labelledby="permanentDiscountsHeading"
@@ -550,8 +470,7 @@ function BookingForm({ userId, token }) {
                 inputId="endTimeInput"
                 value={endTime ? { value: endTime, label: endTime } : null}
                 onChange={(selectedOption) => {
-                  setEndTime(selectedOption.value);
-                  updatePrice(startTime, selectedOption.value);
+                  setEndTime(selectedOption?.value ?? "");
                 }}
                 options={getEndTimeOptions(startTime)}
                 classNamePrefix="time-select"
@@ -593,8 +512,8 @@ function BookingForm({ userId, token }) {
               <button
                 type="submit"
                 className="form-button"
-                disabled={!bookingDate || !startTime || !endTime || form.formState.isSubmitting}
-                aria-disabled={!bookingDate || !startTime || !endTime || form.formState.isSubmitting}
+                disabled={!canBook || form.formState.isSubmitting}
+                aria-disabled={!canBook || form.formState.isSubmitting}
               >
                 Забронировать
               </button>

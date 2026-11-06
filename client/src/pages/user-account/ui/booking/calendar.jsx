@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import Loader from '@/shared/ui/loader';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import '@/shared/ui/styles/calendar.css'
 
 export default function Calendar({ availableDates, bookingDate, setBookingDate }) {
     const [currentDate, setCurrentDate] = useState(new Date());
-    const dates = availableDates.map(date => new Date(date)).sort((a, b) => a - b);
+    const dates = new Set(availableDates);
     const formatDate = (date) => {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -19,7 +18,6 @@ export default function Calendar({ availableDates, bookingDate, setBookingDate }
     const calendarCells = [];
     const firstOfMonth = new Date(year, month, 1);
     const allDaysInMonth = Array.from({ length: new Date(year, month + 1, 0).getDate() }, (_, i) => new Date(year, month, i + 1));
-    const unavailableDates = allDaysInMonth.filter(date => !dates.some(d => formatDate(d) === formatDate(date)));
     const firstAvailableDateWeekday = firstOfMonth.getDay();
 
     const emptyCellsBeforeFirstAvailable = (firstAvailableDateWeekday + 6) % 7;
@@ -29,7 +27,7 @@ export default function Calendar({ availableDates, bookingDate, setBookingDate }
 
     allDaysInMonth.forEach(date => {
         const formattedCurrentDate = formatDate(date);
-        const isUnavailable = unavailableDates.some(d => formatDate(d) === formattedCurrentDate);
+        const isUnavailable = !dates.has(formattedCurrentDate);
 
         let className = "calendar_day";
         if (isUnavailable) className += " no-interval";

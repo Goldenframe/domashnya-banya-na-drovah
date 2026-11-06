@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { api } from "@/shared/api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { cancelBooking, listKey, refreshBookings } from "../../api/booking-queries.js";
 import '@/shared/ui/styles/table.css';
 import '@/shared/ui/styles/account.css';
 import '@/shared/ui/styles/auth.css';
@@ -10,13 +11,22 @@ import { faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
 import useShowMessage from '@/shared/lib/use-show-message.js';
 
 export default function UserUpcomingBookings() {
-    const { bookings, setBookings, userId, token } = useOutletContext();
+    const { bookings, userId, token } = useOutletContext();
     const { message, showMessage, error, showError, isVisible } = useShowMessage();
     const today = new Date();
 
     const [sortParam, setSortParam] = useState('');
     const [sortOrder, setSortOrder] = useState('asc');
-    const apiUrl = import.meta.env.VITE_API_URL; 
+    const queryClient = useQueryClient();
+    const cancellation = useMutation({
+        mutationFn: ({ bookingId }) => cancelBooking(userId, token, bookingId),
+        onSuccess: (_, { bookingId, bookingDate }) => {
+            queryClient.setQueryData(listKey(userId), (current) =>
+                current?.filter((booking) => booking.booking_id !== bookingId)
+            );
+            return refreshBookings(queryClient, userId, bookingDate.slice(0, 10));
+        },
+    });
     const upcomingBookings = bookings.filter(booking => {
         const bookingDateTime = new Date(booking.booking_date);
         const bookingStartTime = new Date(booking.start_time);
@@ -63,10 +73,7 @@ export default function UserUpcomingBookings() {
         }
 
         try {
-            await api.delete(`/api/userAccount/${userId}/bookings/${bookingId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setBookings(prevBookings => prevBookings.filter(booking => booking.booking_id !== bookingId));
+            await cancellation.mutateAsync({ bookingId, bookingDate });
             showMessage('Бронь успешно отменена.');
         } catch (error) {
             console.error('Ошибка при отмене бронирования:', error.response || error.message);
@@ -76,7 +83,7 @@ export default function UserUpcomingBookings() {
 
     return (
         <main className='table-container'>
-            {(message || error) && sortedBookings.length > 0 && (
+            {(message || error) && (
                 <p className={`auth-message ${error ? "error" : "success"} ${isVisible ? "fade-in" : "fade-out"}`} role="alert">
                     {message || error}
                 </p>
@@ -119,7 +126,7 @@ export default function UserUpcomingBookings() {
                                 <td data-label="Цена">{booking.price} ₽</td>
                                 <td data-label="Акция">{booking.discount_status}</td>
                                 <td data-label="Действия">
-                                    <button onClick={() => handleCancelBooking(booking.booking_id, booking.booking_date)} className='table-button'>Отменить</button>
+                                    <button type="button" disabled={cancellation.isPending} onClick={() => handleCancelBooking(booking.booking_id, booking.booking_date)} className='table-button'>Отменить</button>
                                 </td>
                             </tr>
                         ))}

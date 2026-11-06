@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { Link, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import Loader from '@/shared/ui/loader';
@@ -14,6 +15,9 @@ const UserPastBookings = lazy(() => import('./bookings/user-past-bookings.jsx'))
 
 function UserAccount() {
     const navigate = useNavigate();
+    const [queryClient] = useState(() => new QueryClient({
+        defaultOptions: { queries: { retry: false } },
+    }));
     const [userData, setUserData] = useState(null);
 
     useEffect(() => {
@@ -48,25 +52,27 @@ function UserAccount() {
 
 
     return (
-        <div>
-            <UserAccountHeader userId={userData.userId} />
-            <main className="account-container">
-                <Suspense fallback={<Loader />}>
-                    <Routes>
-                        <Route path="/" element={<Navigate to="/" />} />
-                        <Route path='bookingForm' element={<BookingForm userId={userData.userId} token={userData.token} />} />
-                        <Route path="bookings" element={<UserBookings userId={userData.userId} token={userData.token} />}>
-                            <Route path="upcoming" element={<UserUpcomingBookings />} />
-                            <Route path="past" element={<UserPastBookings />} />
-                        </Route>
-                        <Route path='editProfile' element={<EditProfile userId={userData.userId} token={userData.token} updateUserData={updateUserData} />} />
-                        <Route path="*" element={<Navigate to={`/`} />} />
-                    </Routes>
-                </Suspense>
-            </main>
-            <UserFooter userId={userData.userId} />
+        <QueryClientProvider client={queryClient}>
+            <div>
+                <UserAccountHeader userId={userData.userId} />
+                <main className="account-container">
+                    <Suspense fallback={<Loader />}>
+                        <Routes>
+                            <Route path="/" element={<Navigate to="/" />} />
+                            <Route path='bookingForm' element={<BookingForm userId={userData.userId} token={userData.token} />} />
+                            <Route path="bookings" element={<UserBookings userId={userData.userId} token={userData.token} />}>
+                                <Route path="upcoming" element={<UserUpcomingBookings />} />
+                                <Route path="past" element={<UserPastBookings />} />
+                            </Route>
+                            <Route path='editProfile' element={<EditProfile userId={userData.userId} token={userData.token} updateUserData={updateUserData} />} />
+                            <Route path="*" element={<Navigate to={`/`} />} />
+                        </Routes>
+                    </Suspense>
+                </main>
+                <UserFooter userId={userData.userId} />
 
-        </div>
+            </div>
+        </QueryClientProvider>
     );
 }
 

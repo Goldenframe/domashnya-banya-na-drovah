@@ -1,28 +1,12 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { api } from "@/shared/api";
+import { useQuery } from "@tanstack/react-query";
+import { bookingsQuery } from "../../api/booking-queries.js";
 import { NavLink, Outlet } from "react-router-dom";
 import "@/shared/ui/styles/nav.css";
 
 export default function UserBookings({ userId, token }) {
-  const [bookings, setBookings] = useState([]);
-  const apiUrl = import.meta.env.VITE_API_URL;
-  const fetchUserBookings = useCallback(async () => {
-    try {
-      const response = await api.get(
-        `/api/userAccount/${userId}/bookings`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setBookings(response.data);
-    } catch (error) {
-      console.error("Ошибка при получении бронирований:", error);
-    }
-  }, [userId, token]);
-
-  useEffect(() => {
-    fetchUserBookings();
-  }, [fetchUserBookings]);
+  const { data: bookings = [], isPending, isError, refetch } = useQuery(
+    bookingsQuery(userId, token)
+  );
 
   return (
     <div className="account-content">
@@ -53,7 +37,18 @@ export default function UserBookings({ userId, token }) {
         </ul>
       </nav>
       <main className="content" role="main">
-        <Outlet context={{ bookings, setBookings, userId, token }} />
+        {isPending && <p role="status">Загружаем бронирования…</p>}
+        {isError && (
+          <div role="alert">
+            <p>Не удалось загрузить бронирования.</p>
+            <button type="button" className="form-button" onClick={() => refetch()}>
+              Повторить
+            </button>
+          </div>
+        )}
+        {!isPending && (!isError || bookings.length > 0) && (
+          <Outlet context={{ bookings, userId, token }} />
+        )}
       </main>
     </div>
   );
