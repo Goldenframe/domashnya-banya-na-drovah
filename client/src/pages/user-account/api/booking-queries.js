@@ -50,7 +50,6 @@ export function endTimesQuery(userId, token, date, startTime, intervalId) {
         config(token, signal)
       );
       const times = data.availableEndTimes.map(({ endTime }) => endTime);
-      // Preserve the booking form's existing midnight option.
       if (times.length && !times.includes("24:00")) times.push("24:00");
       return times;
     },
@@ -65,7 +64,6 @@ export function calendarQuery(queryClient, userId, token, dates) {
     queryFn: async ({ signal }) => {
       const availableDates = [];
       let failedDays = 0;
-      // The API returns one day at a time. Limit simultaneous requests.
       for (let i = 0; i < dates.length; i += 4) {
         signal.throwIfAborted();
         const batch = dates.slice(i, i + 4);
@@ -94,7 +92,6 @@ export function cancelBooking(userId, token, bookingId) {
 }
 
 export async function refreshBookings(queryClient, userId, date) {
-  // Refresh the changed day first so a calendar refresh reuses the other cached days.
   const availability = queryClient.invalidateQueries({ queryKey: availabilityKey(userId, date) });
   await Promise.all([
     queryClient.invalidateQueries({ queryKey: listKey(userId) }),
